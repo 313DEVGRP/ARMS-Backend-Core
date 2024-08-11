@@ -540,6 +540,9 @@ public class ReqAddController extends TreeAbstractController<ReqAdd, ReqAddDTO, 
 
         int result = reqAdd.updateDataBase(reqAddEntity,changeReqTableName);
 
+        // reqStatus 업데이트 (상태, 우선순위, 난이도)
+        reqAdd.요구사항_상태_디비_업데이트(reqAddEntity, changeReqTableName);
+
         return ResponseEntity.ok(CommonResponse.success(result));
     }
 
