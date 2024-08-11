@@ -46,10 +46,9 @@ import com.arms.egovframework.javaservice.treeframework.util.DateUtils;
 import com.arms.egovframework.javaservice.treeframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,20 +212,6 @@ public class ReqAddImpl extends TreeServiceImpl implements ReqAdd {
 	public Integer updateDataBase(ReqAddEntity reqAddEntity, String changeReqTableName) throws Exception {
 
 		// reqAdd 업데이트 (상태, 우선순위, 난이도, 시작일, 종료일)
-		int 요구사항_디비_업데이트_결과;
-		요구사항_디비_업데이트_결과 = 요구사항_디비_업데이트(reqAddEntity,changeReqTableName);
-
-		// reqStatus 업데이트 (상태, 우선순위, 난이도)
-		int 요구사항_상태_디비_업데이트_결과;
-		요구사항_상태_디비_업데이트_결과 = 요구사항_상태_디비_업데이트(reqAddEntity, changeReqTableName);
-
-		int 요구사항_업데이트_결과 = 요구사항_디비_업데이트_결과 * 요구사항_상태_디비_업데이트_결과;
-
-		return 요구사항_업데이트_결과;
-	}
-
-	private Integer 요구사항_디비_업데이트(ReqAddEntity reqAddEntity, String changeReqTableName) throws Exception{
-		// reqAdd 업데이트
 		SessionUtil.setAttribute("updateDataBase", changeReqTableName);
 
 		int 요구사항_업데이트_결과 = this.updateNode(reqAddEntity);
@@ -241,20 +226,21 @@ public class ReqAddImpl extends TreeServiceImpl implements ReqAdd {
 		return 요구사항_업데이트_결과;
 	}
 
-	private Integer 요구사항_상태_디비_업데이트(ReqAddEntity reqAddEntity, String changeReqTableName) throws Exception{
+	public void 요구사항_상태_디비_업데이트(ReqAddEntity reqAddEntity, String changeReqTableName) throws Exception {
 
 		String pdServiceId = changeReqTableName.replace("T_ARMS_REQADD_", "");
-		String 요구사항_상태_테이블 = "T_ARMS_REQSTATUS_"+pdServiceId;
-		int 업데이트_결과 = 0;
+		PdServiceEntity 요구사항_제품서비스 = 제품데이터조회(pdServiceId);
 
-		SessionUtil.setAttribute("updateDataBase", 요구사항_상태_테이블);
-		ReqStatusEntity searchEntity = new ReqStatusEntity();
+		ReqStatusDTO searchDTO = new ReqStatusDTO();
+		searchDTO.setC_req_link(reqAddEntity.getC_id());
 
-		Criterion criterion = Restrictions.eq("c_req_link", reqAddEntity.getC_id());
-		searchEntity.getCriterions().add(criterion);
-		List<ReqStatusEntity> reqStatusEntityList = reqStatus.getNodesWithoutRoot(searchEntity);
+		// 기존 REQSTATUS 데이터 목록 조회
+		ResponseEntity<List<ReqStatusEntity>> 요구사항_상태목록
+				= internalService.REQADD_CID_요구사항_이슈_조회("T_ARMS_REQSTATUS_" + pdServiceId, searchDTO);
+		List<ReqStatusEntity> reqStatusEntityList = 요구사항_상태목록.getBody();
 
-		for(ReqStatusEntity reqStatusEntity : reqStatusEntityList){
+		for (ReqStatusEntity reqStatusEntity : reqStatusEntityList) {
+
 			if (reqAddEntity.getReqStateEntity() != null) {
 				reqStatusEntity.setC_req_state_name(reqAddEntity.getReqStateEntity().getC_title());
 				reqStatusEntity.setC_req_state_link(reqAddEntity.getReqStateEntity().getC_id());
@@ -270,22 +256,19 @@ public class ReqAddImpl extends TreeServiceImpl implements ReqAdd {
 				reqStatusEntity.setC_req_difficulty_link(reqAddEntity.getReqDifficultyEntity().getC_id());
 			}
 
+			ModelMapper modelMapper = new ModelMapper();
+			ReqStatusDTO reqStatusDTO = modelMapper.map(reqStatusEntity, ReqStatusDTO.class);
+			ResponseEntity<?> 결과 = internalService.요구사항_이슈_수정하기("T_ARMS_REQSTATUS_" + 요구사항_제품서비스.getC_id(), reqStatusDTO);
+
+			if (!결과.getStatusCode().is2xxSuccessful()) {
+				logger.error("T_ARMS_REQSTATUS_" + 요구사항_제품서비스.getC_id() + " :: 삭제 오류 :: " + reqStatusDTO.toString());
+			}
+
 			// ALM 요구사항 상태 변경 요청 (상태 값 변경이 있을 경우)
-			reqStatus.ALM_이슈상태_업데이트(reqStatusEntity);
-
-			업데이트_결과 = reqStatus.updateNode(reqStatusEntity);
-			업데이트_결과 *= 업데이트_결과;
-
+			if (reqAddEntity.getReqStateEntity() != null) {
+				reqStatus.ALM_이슈상태_업데이트(reqStatusEntity);
+			}
 		}
-
-		SessionUtil.removeAttribute("updateDataBase");
-
-		if (업데이트_결과 == 0) {
-			logger.info("ReqAddImpl :: updateDataBase :: 요구사항 업데이트에 실패했습니다. 요구사항 ID : " + reqAddEntity.getC_id());
-			throw new Exception("요구사항 업데이트에 실패했습니다. 관리자에게 문의해 주세요.");
-		}
-
-		return 업데이트_결과;
 	}
 
 	public List<요구사항_담당자> getRequirementAssignee(PdServiceEntity pdServiceEntity)  {
@@ -348,7 +331,7 @@ public class ReqAddImpl extends TreeServiceImpl implements ReqAdd {
 		}
 
 		// 연결된 버전의 프로젝트 목록으로 REQSTATUS 데이터 추가
-		this.연결된_버전의_프로젝트별로_REQSTATUS_데이터추가(savedReqAddEntity, 지라프로젝트_아이디_셋, 요구사항_제품서비스);
+		this.연결된_버전의_프로젝트별_REQSTATUS_데이터추가(savedReqAddEntity, 지라프로젝트_아이디_셋, 요구사항_제품서비스);
 
 		ReqStatusDTO reqStatusDTO = new ReqStatusDTO();
 		reqStatusDTO.setC_req_link(요구사항_아이디);
@@ -356,7 +339,7 @@ public class ReqAddImpl extends TreeServiceImpl implements ReqAdd {
 		internalService.요구사항_상태_확인후_ALM처리_및_REQSTATUS_업데이트("T_ARMS_REQSTATUS_" + 제품서비스_아이디, reqStatusDTO);
 	}
 
-	public void 연결된_버전의_프로젝트별로_REQSTATUS_데이터추가(ReqAddEntity savedReqAddEntity, Set<Long> 지라프로젝트_아이디_셋, PdServiceEntity 요구사항_제품서비스) throws Exception {
+	public void 연결된_버전의_프로젝트별_REQSTATUS_데이터추가(ReqAddEntity savedReqAddEntity, Set<Long> 지라프로젝트_아이디_셋, PdServiceEntity 요구사항_제품서비스) throws Exception {
 
 		Long 제품서비스_아이디 = 요구사항_제품서비스.getC_id();
 
@@ -447,7 +430,7 @@ public class ReqAddImpl extends TreeServiceImpl implements ReqAdd {
 				.collect(Collectors.toList());
 
 		// 새로운 버전의 프로젝트의 경우 REQSTATUS 추가로직 수행
-		this.연결된_버전의_프로젝트별로_REQSTATUS_데이터추가(reqAddEntity, 추가된지라프로젝트아이디, 요구사항_제품서비스);
+		this.연결된_버전의_프로젝트별_REQSTATUS_데이터추가(reqAddEntity, 추가된지라프로젝트아이디, 요구사항_제품서비스);
 		this.연결된_버전의_프로젝트별_REQSTATUS_데이터수정(reqAddEntity, 유지된_REQSTATUS_목록, 요구사항_제품서비스, CRUDType.수정.getType());
 		// 요구사항 수정 시 연결 해제된 프로젝트의 요구사항 이슈의 경우 soft delete 처리
 		this.연결된_버전의_프로젝트별_REQSTATUS_데이터수정(reqAddEntity, 삭제된_REQSTATUS_목록, 요구사항_제품서비스, CRUDType.소프트_삭제.getType());
@@ -496,7 +479,7 @@ public class ReqAddImpl extends TreeServiceImpl implements ReqAdd {
 			// 업데이트할 c_id 설정
 			reqStatusDTO.setC_id(reqStatusEntity.getC_id());
 			// ALM 서버의 요구사항 생성이 아직 진행되기 전에 삭제를 할 경우 삭제 처리로 전환 / 수정이 발생할 경우 방어코드
-			if ( (StringUtils.equals(CRUD_타입, CRUDType.하드_삭제.getType()) || StringUtils.equals(CRUD_타입, CRUDType.소프트_삭제.getType()))
+			if ((StringUtils.equals(CRUD_타입, CRUDType.하드_삭제.getType()) || StringUtils.equals(CRUD_타입, CRUDType.소프트_삭제.getType()))
 											&& reqStatusEntity.getC_issue_key() == null) {
 				reqStatusDTO.setC_etc(CRUD_타입);
 			}

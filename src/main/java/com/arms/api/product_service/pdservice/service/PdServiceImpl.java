@@ -381,7 +381,7 @@ public class PdServiceImpl extends TreeServiceImpl implements PdService {
                                                 }
                                                 if (!지라서버명.isBlank()) {
                                                     레벨4_지라프로젝트_목록.add(PdServiceD3Chart.builder()
-                                                            .type("Jira")
+                                                            .type("ALM")
                                                             .name(지라서버명 + " " + 지라프로젝트_명)
                                                             .build());
                                                 }

@@ -56,10 +56,15 @@ public class ResourceServiceImpl implements ResourceService {
         Map<String, String> mail_name_map = new HashMap<>();
 
         ResponseEntity<검색결과_목록_메인> 일반_버전필터_집계 = aggregationService.일반_버전필터_집계(pdServiceId, pdServiceVersionLinks, 검색요청_데이터);
-        Long 전체합계 = 일반_버전필터_집계.getBody().get전체합계();
+        Long 전체합계 = Optional.ofNullable(일반_버전필터_집계.getBody())
+                                .map(검색결과_목록_메인::get전체합계)
+                                .orElse(0L);
 
         if (전체합계 != 0L) {
-            Map<String, List<검색결과>> 검색결과 = 일반_버전필터_집계.getBody().get검색결과();
+            Map<String, List<검색결과>> 검색결과 = Optional.ofNullable(일반_버전필터_집계.getBody())
+                                                            .map(검색결과_목록_메인::get검색결과)
+                                                            .orElse(Collections.emptyMap());
+
             List<검색결과> 작업자별결과 = Optional.ofNullable(검색결과.get("group_by_" + AggregationConstant.담당자_이메일_집계)).orElse(Collections.emptyList());
 
             for(검색결과 결과 : 작업자별결과) {
