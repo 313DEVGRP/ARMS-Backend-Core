@@ -19,6 +19,7 @@ import com.arms.api.requirement.reqstate_category.model.ReqStateCategoryEntity;
 import com.arms.api.requirement.reqstate_category.service.ReqStateCategory;
 import com.arms.config.ArmsDetailUrlConfig;
 import com.arms.egovframework.javaservice.treeframework.controller.TreeAbstractController;
+import com.arms.egovframework.javaservice.treeframework.validation.group.AddNode;
 import com.arms.egovframework.javaservice.treeframework.validation.group.UpdateNode;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -63,6 +64,30 @@ public class ReqStateController extends TreeAbstractController<ReqState, ReqStat
     @Autowired
     @Qualifier("reqStateCategory")
     private ReqStateCategory reqStateCategory;
+
+    @ResponseBody
+    @RequestMapping(value = "/addStateNode.do", method = RequestMethod.POST)
+    public ModelAndView addStateNode(@Validated(value = AddNode.class) ReqStateDTO reqStateDTO,
+                                   BindingResult bindingResult, HttpServletRequest request, ModelMap model) throws Exception {
+
+        log.info("ReqStateController :: addStateNode");
+        ReqStateEntity reqStateEntity = modelMapper.map(reqStateDTO, ReqStateEntity.class);
+
+        if (reqStateDTO.getC_state_category_mapping_id() != null) {
+            ReqStateCategoryEntity searchEntity = new ReqStateCategoryEntity();
+            searchEntity.setC_id(reqStateDTO.getC_state_category_mapping_id());
+            ReqStateCategoryEntity reqStateCategoryEntity = reqStateCategory.getNode(searchEntity);
+            reqStateEntity.setReqStateCategoryEntity(reqStateCategoryEntity);
+        }
+
+        if (reqStateDTO.getC_desc() == null) {
+            reqStateDTO.setC_desc("false");
+        }
+
+        ModelAndView modelAndView = new ModelAndView("jsonView");
+        modelAndView.addObject("result", reqState.addNode(reqStateEntity));
+        return modelAndView;
+    }
 
     @ResponseBody
     @RequestMapping(value = "/updateNode.do", method = RequestMethod.PUT)
