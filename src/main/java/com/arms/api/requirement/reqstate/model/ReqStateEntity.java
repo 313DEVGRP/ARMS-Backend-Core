@@ -61,6 +61,10 @@ public class ReqStateEntity extends TreeSearchEntity implements Serializable {
     @Column(name = "c_etc")
     private String c_etc;
 
+    // 기본 상태 여부
+    @Column(name = "c_check")
+    private String c_check;
+
     // 상태 카테고리 1:1 Row 단방향 연계
     private ReqStateCategoryEntity reqStateCategoryEntity;
 

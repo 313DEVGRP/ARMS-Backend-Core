@@ -70,14 +70,20 @@ public class CommonServiceImpl implements CommonService {
                                 if (reqStateEntity == null) {
                                     return "null";
                                 }
-                                long stateId = entity.getReqStateEntity().getC_id();
-                                if (stateId == 10L) {
+
+                                // 고객사 상태의 매핑된 ARMS 상태 카테고리(열림, 진행중, 해결됨, 닫힘) 기준으로 계산하도록 변경
+                                if (entity.getReqStateEntity().getReqStateCategoryEntity() == null) {
+                                    return "null";
+                                }
+
+                                long categoryId = entity.getReqStateEntity().getReqStateCategoryEntity().getC_id();
+                                if (categoryId == 3L) {
                                     return "open";
-                                } else if (stateId == 11L) {
+                                } else if (categoryId == 4L) {
                                     return "in-progress";
-                                } else if (stateId == 12L) {
+                                } else if (categoryId == 5L) {
                                     return "resolved";
-                                } else if (stateId == 13L) {
+                                } else if (categoryId == 6L) {
                                     return "closed";
                                 } else {
                                     return "other";
