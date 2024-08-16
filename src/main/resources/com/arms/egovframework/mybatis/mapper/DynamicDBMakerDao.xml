@@ -55,8 +55,8 @@
 
             `c_drawio_contents`           longtext null comment 'drawio xml',
             `c_drawio_image_raw`              longtext null comment 'drawio image raw data',
---             `c_drawdb_contents`           longtext null comment 'drawdb xml',
---             `c_drawdb_image_raw`           longtext null comment 'drawdb image raw data',
+            `c_drawdb_contents`           longtext null comment 'drawdb xml',
+
 
             `c_req_etc`                 varchar(255)    COMMENT '비고',
             `c_req_desc`                text            COMMENT '설명',
@@ -115,8 +115,7 @@
 
             `c_drawio_contents`           bigint null comment 'drawio xml',
             `c_drawio_image_raw`              longtext null comment 'drawio image raw data',
---             `c_drawdb_contents`           bigint null comment 'drawdb xml',
---             `c_drawdb_image_raw`           longtext null comment 'drawdb image raw data',
+            `c_drawdb_contents`           bigint null comment 'drawdb xml',
 
             `c_req_etc`                 varchar(255)    COMMENT '비고',
             `c_req_desc`                text            COMMENT '설명',
