@@ -18,5 +18,5 @@ import java.util.Map;
 
 public interface ReqState extends TreeService {
 
-    Map<Long, ReqStateEntity> 완료상태조회(ReqStateEntity reqStateEntity) throws Exception;
+    Map<Long, ReqStateEntity> 완료상태조회() throws Exception;
 }

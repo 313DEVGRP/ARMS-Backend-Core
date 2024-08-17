@@ -12,8 +12,8 @@
 package com.arms.api.requirement.reqstate.service;
 
 import com.arms.api.requirement.reqstate.model.ReqStateEntity;
-import com.arms.config.ArmsDetailUrlConfig;
 import com.arms.egovframework.javaservice.treeframework.service.TreeServiceImpl;
+import com.arms.egovframework.javaservice.treeframework.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -32,29 +32,19 @@ public class ReqStateImpl extends TreeServiceImpl implements ReqState{
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	private ArmsDetailUrlConfig armsDetailUrlConfig;
-
 	@Override
-	public Map<Long, ReqStateEntity> 완료상태조회(ReqStateEntity reqStateEntity) throws Exception {
-
-		// 요구사항의 완료에 대한 기준을 위한 정책 및 컬럼 있을 시 사용.
+	public Map<Long, ReqStateEntity> 완료상태조회() throws Exception {
+		ReqStateEntity reqStateEntity = new ReqStateEntity();
 		List<ReqStateEntity> 전체상태목록 = this.getNodesWithoutRoot(reqStateEntity);
-
-		// 완료키워드와 일치하는 데이터만 필터링
-		Set<String> 완료_키워드_셋 = new HashSet<>();
-		if (armsDetailUrlConfig != null && armsDetailUrlConfig.getCompleteKeyword() != null) {
-			String[] keywords = armsDetailUrlConfig.getCompleteKeyword().split(",");
-			완료_키워드_셋.addAll(Arrays.asList(keywords));
-		}
-		Map<Long, ReqStateEntity> 완료상태맵 = this.완료상태_필터링(전체상태목록, 완료_키워드_셋);
+		Map<Long, ReqStateEntity> 완료상태맵 = this.완료상태_카테고리_필터링(전체상태목록);
 
 		return 완료상태맵;
 	}
 
-	private Map<Long, ReqStateEntity> 완료상태_필터링(List<ReqStateEntity> 전체상태목록, Set<String> 완료_키워드셋) {
+	private Map<Long, ReqStateEntity> 완료상태_카테고리_필터링(List<ReqStateEntity> 전체상태목록) {
 		return 전체상태목록.stream()
-				.filter(상태 -> 상태.getC_title() != null && 완료_키워드셋.contains(상태.getC_title()))
+				.filter(상태 -> 상태.getReqStateCategoryEntity() != null && 상태.getReqStateCategoryEntity().getC_closed() != null
+									&& StringUtils.equals(상태.getReqStateCategoryEntity().getC_closed(), "true"))
 				.collect(Collectors.toMap(ReqStateEntity::getC_id, 상태엔티티 -> 상태엔티티));
 	}
 }

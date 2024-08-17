@@ -80,8 +80,8 @@ public class ReqStateController extends TreeAbstractController<ReqState, ReqStat
             reqStateEntity.setReqStateCategoryEntity(reqStateCategoryEntity);
         }
 
-        if (reqStateDTO.getC_desc() == null) {
-            reqStateDTO.setC_desc("false");
+        if (reqStateDTO.getC_check() == null) {
+            reqStateDTO.setC_check("false");
         }
 
         ModelAndView modelAndView = new ModelAndView("jsonView");
