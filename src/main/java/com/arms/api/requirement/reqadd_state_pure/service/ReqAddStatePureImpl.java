@@ -4,10 +4,10 @@ import com.arms.api.analysis.common.model.AggregationRequestDTO;
 import com.arms.api.requirement.reqadd_state_pure.model.ReqAddStatePureEntity;
 import com.arms.api.requirement.reqstate.model.ReqStateEntity;
 import com.arms.api.requirement.reqstate.service.ReqState;
+import com.arms.api.util.communicate.external.AggregationService;
 import com.arms.api.util.communicate.external.request.aggregation.지라이슈_단순_집계_요청;
 import com.arms.api.util.communicate.external.response.aggregation.검색결과;
 import com.arms.api.util.communicate.external.response.aggregation.검색결과_목록_메인;
-import com.arms.api.util.communicate.external.AggregationService;
 import com.arms.egovframework.javaservice.treeframework.TreeConstant;
 import com.arms.egovframework.javaservice.treeframework.interceptor.SessionUtil;
 import com.arms.egovframework.javaservice.treeframework.remote.Chat;
@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -106,11 +105,7 @@ public class ReqAddStatePureImpl extends TreeServiceImpl implements ReqAddStateP
 		검색결과_목록_메인 완료상태집계결과목록 = Optional.ofNullable(완료상태.getBody()).orElse(new 검색결과_목록_메인());
 		집계결과처리(진행률계산맵, 완료상태집계결과목록, "완료");
 
-		ReqStateEntity reqStateEntity = new ReqStateEntity();
-		Map<Long, ReqStateEntity> 완료상태맵 = reqState.완료상태조회(reqStateEntity);
-		Function<ReqStateEntity, Long> key = ReqStateEntity::getC_id;
-		Function<ReqStateEntity, ReqStateEntity> value = Function.identity();
-		Map<Long, ReqStateEntity> 전체상태맵 = reqState.getNodesWithoutRootMap(reqStateEntity, key, value);
+		Map<Long, ReqStateEntity> 완료상태맵 = reqState.완료상태조회();
 
 		// 실적, 계획 진행퍼센트 처리
 		List<ReqAddStatePureEntity> 실적계산_결과목록 = 전체요구사항_목록.stream().map(요구사항_엔티티 -> {
