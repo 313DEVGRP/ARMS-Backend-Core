@@ -52,9 +52,6 @@ requirement:
     type: hard delete      # (두 가지 유형)
                             # soft delete - 이슈 제목 및 본문 삭제 수정 처리(default)
                             # hard delete - 삭제 API 호출 처리
-  state:
-    complete:
-      keyword: 해결됨,닫힘
 
 cors:
   allowed-origins: "http://localhost,http://127.0.0.1,http://localhost:9999,http://127.0.0.1:9999,http://313.co.kr,http://www.313.co.kr,https://313.co.kr,https://www.313.co.kr,http://313.co.kr:9999,http://www.313.co.kr:9999,http://a-rms.net,http://www.a-rms.net,https://a-rms.net,https://www.a-rms.net,http://www.a-rms.net:9999,http://a-rms.net:9999,http://mad-dev.megazone.com,http://192.168.4.141"
