@@ -14,16 +14,22 @@ package com.arms.api.jira.jiraproject_pure.controller;
 import com.arms.api.jira.jiraproject_pure.model.JiraProjectPureDTO;
 import com.arms.api.jira.jiraproject_pure.model.JiraProjectPureEntity;
 import com.arms.api.jira.jiraproject_pure.service.JiraProjectPure;
+import com.arms.egovframework.javaservice.treeframework.controller.CommonResponse;
 import com.arms.egovframework.javaservice.treeframework.controller.TreeAbstractController;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -40,6 +46,17 @@ public class JiraProjectPureController extends TreeAbstractController<JiraProjec
         setTreeEntity(JiraProjectPureEntity.class);
     }
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @ResponseBody
+    @GetMapping("/getJiraProjects.do")
+    public ResponseEntity<CommonResponse.ApiResult<List<JiraProjectPureEntity>>> getJiraProjectPures(
+            @RequestParam(name = "pdServiceId") Long pdServiceId,
+            @RequestParam(name = "pdServiceVersionIds", required = false) List<Long> pdServiceVersionIds
+    ) throws Exception {
+
+        List<JiraProjectPureEntity> jiraProjectsByProduct = jiraProjectPure.getJiraProjects(pdServiceId, pdServiceVersionIds);
+
+        return ResponseEntity.ok(CommonResponse.success(jiraProjectsByProduct));
+    }
 }

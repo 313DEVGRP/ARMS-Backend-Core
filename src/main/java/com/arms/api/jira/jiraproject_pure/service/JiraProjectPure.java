@@ -11,7 +11,12 @@
  */
 package com.arms.api.jira.jiraproject_pure.service;
 
+import com.arms.api.jira.jiraproject_pure.model.JiraProjectPureEntity;
 import com.arms.egovframework.javaservice.treeframework.service.TreeService;
 
+import java.util.List;
+
 public interface JiraProjectPure extends TreeService {
+
+    List<JiraProjectPureEntity> getJiraProjects(Long pdServiceId, List<Long> pdServiceVersionIds) throws Exception;
 }
