@@ -17,7 +17,6 @@ import com.arms.api.requirement.reqstate.model.ReqStateEntity;
 import com.arms.api.requirement.reqstate.service.ReqState;
 import com.arms.api.requirement.reqstate_category.model.ReqStateCategoryEntity;
 import com.arms.api.requirement.reqstate_category.service.ReqStateCategory;
-import com.arms.config.ArmsDetailUrlConfig;
 import com.arms.egovframework.javaservice.treeframework.controller.TreeAbstractController;
 import com.arms.egovframework.javaservice.treeframework.validation.group.AddNode;
 import com.arms.egovframework.javaservice.treeframework.validation.group.UpdateNode;
@@ -46,20 +45,17 @@ import java.util.stream.Collectors;
 @RequestMapping(value = {"/arms/reqState"})
 public class ReqStateController extends TreeAbstractController<ReqState, ReqStateDTO, ReqStateEntity> {
 
-    @Autowired
-    @Qualifier("reqState")
-    private ReqState reqState;
-
     @PostConstruct
     public void initialize() {
         setTreeService(reqState);
-		setTreeEntity(ReqStateEntity.class);
+        setTreeEntity(ReqStateEntity.class);
     }
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private ArmsDetailUrlConfig armsDetailUrlConfig;
+    @Qualifier("reqState")
+    private ReqState reqState;
 
     @Autowired
     @Qualifier("reqStateCategory")
@@ -114,13 +110,13 @@ public class ReqStateController extends TreeAbstractController<ReqState, ReqStat
             value = {"/complete-keyword"},
             method = {RequestMethod.GET}
     )
-    public ModelAndView 요구사항_완료_키워드조회() {
+    public ModelAndView 요구사항_완료_키워드조회() throws Exception {
         logger.info(" [ " + this.getClass().getName() + " :: 요구사항_완료_키워드조회 ]");
         Set<String> 완료_키워드_셋 = new HashSet<>();
-        if (armsDetailUrlConfig != null && armsDetailUrlConfig.getCompleteKeyword() != null) {
-            String[] keywords = armsDetailUrlConfig.getCompleteKeyword().split(",");
-            완료_키워드_셋.addAll(Arrays.asList(keywords));
-        }
+        Map<Long, ReqStateEntity> 완료상태맵 = reqState.완료상태조회();
+        완료상태맵.forEach((key, value) -> {
+            완료_키워드_셋.add(value.getC_title());
+        });
 
         ModelAndView modelAndView = new ModelAndView("jsonView");
         modelAndView.addObject("result", 완료_키워드_셋);

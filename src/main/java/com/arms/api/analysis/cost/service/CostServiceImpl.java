@@ -1,31 +1,25 @@
 package com.arms.api.analysis.cost.service;
 
+import com.arms.api.analysis.common.model.AggregationConstant;
 import com.arms.api.analysis.common.model.AggregationRequestDTO;
-import com.arms.api.analysis.cost.model.CandleStick;
-import com.arms.api.analysis.cost.model.ProductCostResponse;
-import com.arms.api.analysis.cost.model.버전별_요구사항별_연결된_지라이슈데이터;
-import com.arms.api.analysis.cost.model.버전요구사항별_담당자데이터;
+import com.arms.api.analysis.common.model.IsReqType;
+import com.arms.api.analysis.cost.model.*;
 import com.arms.api.product_service.pdserviceversion.model.PdServiceVersionEntity;
 import com.arms.api.product_service.pdserviceversion.service.PdServiceVersion;
-import com.arms.api.requirement.reqstate.model.ReqStateEntity;
-import com.arms.api.requirement.reqstate.service.ReqState;
-import com.arms.api.requirement.reqstatus.model.ReqStatusDTO;
-import com.arms.api.analysis.cost.model.SalaryLogJdbcDTO;
-import com.arms.api.analysis.cost.model.SalaryEntity;
-import com.arms.api.analysis.cost.model.요구사항목록_난이도_및_우선순위통계데이터;
 import com.arms.api.requirement.reqadd.model.ReqAddDTO;
 import com.arms.api.requirement.reqadd.model.ReqAddEntity;
 import com.arms.api.requirement.reqadd.service.ReqAdd;
 import com.arms.api.requirement.reqdifficulty.model.ReqDifficultyEntity;
 import com.arms.api.requirement.reqpriority.model.ReqPriorityEntity;
+import com.arms.api.requirement.reqstate.model.ReqStateEntity;
+import com.arms.api.requirement.reqstate.service.ReqState;
+import com.arms.api.requirement.reqstatus.model.ReqStatusDTO;
 import com.arms.api.requirement.reqstatus.model.ReqStatusEntity;
 import com.arms.api.requirement.reqstatus.service.ReqStatus;
-import com.arms.api.analysis.common.model.AggregationConstant;
-import com.arms.api.analysis.common.model.IsReqType;
 import com.arms.api.util.communicate.external.AggregationService;
+import com.arms.api.util.communicate.external.request.aggregation.지라이슈_일반_집계_요청;
 import com.arms.api.util.communicate.external.response.aggregation.검색결과;
 import com.arms.api.util.communicate.external.response.aggregation.검색결과_목록_메인;
-import com.arms.api.util.communicate.external.request.aggregation.지라이슈_일반_집계_요청;
 import com.arms.api.util.communicate.internal.InternalService;
 import com.arms.egovframework.javaservice.treeframework.interceptor.SessionUtil;
 import com.arms.egovframework.javaservice.treeframework.remote.Chat;
@@ -37,7 +31,6 @@ import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -52,9 +45,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class CostServiceImpl implements CostService {
-
-    @Value("${requirement.state.complete.keyword}")
-    private String resolvedKeyword;
 
     private final AggregationService aggregationService;
 
@@ -318,8 +308,8 @@ public class CostServiceImpl implements CostService {
     @Override
     public ProductCostResponse calculateInvestmentPerformance(AggregationRequestDTO aggregationRequestDTO) throws Exception {
         // 1. 해결 된 이슈를 찾기 위해 해결 상태값을 조회함. (ReqState)
-        List<ReqStateEntity> reqStateEntities = getReqStateEntities();
-        List<Long> filteredReqStateId = filterResolvedStateIds(reqStateEntities, resolvedKeyword);
+        Map<Long, ReqStateEntity> 완료상태맵 = reqStateService.완료상태조회();
+        List<Long> filteredReqStateId = filterResolvedStateIds(완료상태맵);
 
         // 2. ReqStatus(요구사항)을 조회함
         List<ReqStatusEntity> reqStatusEntities = getReqStatusEntities(aggregationRequestDTO);
@@ -603,11 +593,8 @@ public class CostServiceImpl implements CostService {
         return reqStateService.getNodesWithoutRoot(new ReqStateEntity());
     }
 
-    private List<Long> filterResolvedStateIds(List<ReqStateEntity> reqStateEntities, String resolvedKeyword) {
-        return reqStateEntities.stream()
-                .filter(reqStateEntity -> resolvedKeyword.contains(reqStateEntity.getC_title()))
-                .map(ReqStateEntity::getC_id)
-                .collect(Collectors.toList());
+    private List<Long> filterResolvedStateIds(Map<Long, ReqStateEntity> 완료상태맵) {
+        return 완료상태맵.keySet().stream().collect(Collectors.toList());
     }
 
     private List<ReqStatusEntity> getReqStatusEntities(AggregationRequestDTO requestDTO) {
