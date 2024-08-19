@@ -246,6 +246,10 @@ public class DashboardServiceImpl implements DashboardService {
             for(Long 요구사항_아이디 : 요구사항_아이디_목록) {
                 if (요구사항_아이디_상태_아이디_맵.containsKey(요구사항_아이디)) {
                     Long 상태_아이디 = 요구사항_아이디_상태_아이디_맵.get(요구사항_아이디);
+                    if (상태_아이디 == null) {
+                        continue;
+                    }
+
                     요구사항_상태별_개수_맵.put(상태_아이디, 요구사항_상태별_개수_맵.getOrDefault(상태_아이디,0L)+1);
                 }
             }
@@ -278,7 +282,10 @@ public class DashboardServiceImpl implements DashboardService {
         for(ReqAddEntity entity : 검색_결과_목록) {
             if(StringUtils.equals(entity.getC_type(),"default")) {
                 Long reqAddId = entity.getC_id();
-                Long stateId = Optional.ofNullable(entity.getReqStateEntity().getC_id()).orElse(null);
+                Long stateId = Optional.ofNullable(entity)
+                        .map(e -> e.getReqStateEntity())
+                        .map(e -> e.getC_id())
+                        .orElse(null);
                 요구사항_아이디_상태_맵.put(reqAddId,stateId);
             }
         }
