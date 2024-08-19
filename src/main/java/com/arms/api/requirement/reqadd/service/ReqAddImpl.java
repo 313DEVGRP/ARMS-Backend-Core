@@ -160,40 +160,37 @@ public class ReqAddImpl extends TreeServiceImpl implements ReqAdd {
 				.map(PdServiceVersionEntity::getC_title)
 				.collect(Collectors.joining(","));
 
-		if(followReqLinkDTO.getJiraProject()!=null){
-			JiraProjectEntity jiraProjectSearchEntity = new JiraProjectEntity();
-			jiraProjectSearchEntity.setC_id(followReqLinkDTO.getJiraProject());
-			JiraProjectEntity jiraProjectEntity = jiraProject.getNode(jiraProjectSearchEntity);
+		ReqAddDetailDTO.ReqAddDetailDTOBuilder reqAddDetailDTOBuilder = ReqAddDetailDTO.builder()
+															.pdService_c_title(pdServiceEntity.getC_title())
+															.pdServiceVersion_c_title(pdServiceVersionTitles)
+															.pdService_c_id(pdServiceEntity.getC_id())
+															.reqAdd_c_title(reqAddEntity.getC_title())
+															.reqAdd_c_req_writer(reqAddEntity.getC_req_writer())
+															.reqAdd_c_req_create_date(reqAddEntity.getC_req_create_date())
+															.reqAdd_c_req_reviewer01(reqAddEntity.getC_req_reviewer01())
+															.reqAdd_c_req_reviewer02(reqAddEntity.getC_req_reviewer02())
+															.reqAdd_c_req_reviewer03(reqAddEntity.getC_req_reviewer03())
+															.reqAdd_c_req_reviewer04(reqAddEntity.getC_req_reviewer04())
+															.reqAdd_c_req_reviewer05(reqAddEntity.getC_req_reviewer05())
+															.reqAdd_c_req_contents(reqAddEntity.getC_req_contents())
+															.reqAdd_c_req_start_date(reqAddEntity.getC_req_start_date())
+															.reqAdd_c_req_end_date(reqAddEntity.getC_req_end_date())
+															.c_drawio_contents(reqAddEntity.getC_drawio_contents())
+															.c_drawio_image_raw(reqAddEntity.getC_drawio_image_raw());
+
+		if (reqAddEntity.getReqStateEntity() != null && reqAddEntity.getReqStateEntity().getC_id() != null) {
+			reqAddDetailDTOBuilder.reqAdd_c_req_state_link(reqAddEntity.getReqStateEntity().getC_id());
 		}
 
-		if(followReqLinkDTO.getJiraServer()!=null) {
-			JiraServerEntity searchJiraServerEntity = new JiraServerEntity();
-			searchJiraServerEntity.setC_id(followReqLinkDTO.getJiraServer());
-			JiraServerEntity jiraServerEntity = jiraServer.getNode(searchJiraServerEntity);
+		if (reqAddEntity.getReqDifficultyEntity() != null && reqAddEntity.getReqDifficultyEntity().getC_id() != null) {
+			reqAddDetailDTOBuilder.reqAdd_c_req_difficulty_link(reqAddEntity.getReqDifficultyEntity().getC_id());
 		}
 
+		if (reqAddEntity.getReqPriorityEntity() != null && reqAddEntity.getReqPriorityEntity().getC_id() != null) {
+			reqAddDetailDTOBuilder.reqAdd_c_req_priority_link(reqAddEntity.getReqPriorityEntity().getC_id());
+		}
 
-		return ReqAddDetailDTO.builder()
-				.pdService_c_title(pdServiceEntity.getC_title())
-				.pdServiceVersion_c_title(pdServiceVersionTitles)
-				.pdService_c_id(pdServiceEntity.getC_id())
-				.reqAdd_c_title(reqAddEntity.getC_title())
-				.reqAdd_c_req_writer(reqAddEntity.getC_req_writer())
-				.reqAdd_c_req_create_date(reqAddEntity.getC_req_create_date())
-				.reqAdd_c_req_reviewer01(reqAddEntity.getC_req_reviewer01())
-				.reqAdd_c_req_reviewer02(reqAddEntity.getC_req_reviewer02())
-				.reqAdd_c_req_reviewer03(reqAddEntity.getC_req_reviewer03())
-				.reqAdd_c_req_reviewer04(reqAddEntity.getC_req_reviewer04())
-				.reqAdd_c_req_reviewer05(reqAddEntity.getC_req_reviewer05())
-				.reqAdd_c_req_contents(reqAddEntity.getC_req_contents())
-				.reqAdd_c_req_state_link(reqAddEntity.getReqStateEntity().getC_id())
-				.reqAdd_c_req_difficulty_link(reqAddEntity.getReqDifficultyEntity().getC_id())
-				.reqAdd_c_req_priority_link(reqAddEntity.getReqPriorityEntity().getC_id())
-				.reqAdd_c_req_start_date(reqAddEntity.getC_req_start_date())
-				.reqAdd_c_req_end_date(reqAddEntity.getC_req_end_date())
-				.c_drawio_contents(reqAddEntity.getC_drawio_contents())
-				.c_drawio_image_raw(reqAddEntity.getC_drawio_image_raw())
-				.build();
+		return reqAddDetailDTOBuilder.build();
 	}
 
 	@Override

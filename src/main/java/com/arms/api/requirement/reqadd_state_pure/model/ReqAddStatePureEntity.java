@@ -55,6 +55,7 @@ public class ReqAddStatePureEntity extends TreeSearchEntity implements Serializa
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonManagedReference
     @OneToOne
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "c_req_state_link", referencedColumnName = "c_id")
     public ReqStateEntity getReqStateEntity() { return reqStateEntity; }
 
