@@ -180,4 +180,11 @@ public interface EngineService {
             @RequestParam("pdServiceId") Long pdServiceLink,
             @RequestParam("pdServiceVersions") Long[] pdServiceVersionLinks,
             @RequestParam("cReqLink") Long 요구사항_아이디);
+
+    /*
+     *  요구사항 묶음 조회(함께 생성된 요구사항 이슈 모두 조회)
+     * */
+    @GetMapping("/engine/report/issue-list")
+    ResponseEntity<List<지라이슈>> 이슈조회(
+            @RequestParam("pdServiceId") Long pdServiceId);
 }
