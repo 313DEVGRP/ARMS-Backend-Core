@@ -18,10 +18,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -46,5 +47,27 @@ public class ReqStateImpl extends TreeServiceImpl implements ReqState{
 				.filter(상태 -> 상태.getReqStateCategoryEntity() != null && 상태.getReqStateCategoryEntity().getC_closed() != null
 									&& StringUtils.equals(상태.getReqStateCategoryEntity().getC_closed(), "true"))
 				.collect(Collectors.toMap(ReqStateEntity::getC_id, 상태엔티티 -> 상태엔티티));
+	}
+
+	@Override
+	@Transactional
+	public List<ReqStateEntity> 기본_상태_설정(ReqStateEntity reqStateEntity) throws Exception {
+		ReqStateEntity reqState = new ReqStateEntity();
+		List<ReqStateEntity> 전체상태목록 = this.getNodesWithoutRoot(reqState);
+
+		List<ReqStateEntity> 기본값_설정_상태목록 = 전체상태목록.stream()
+									.map(상태 -> {
+										if (reqStateEntity.getC_id() == 상태.getC_id()) {
+											상태.setC_check("true");
+										}
+										else {
+											상태.setC_check("false");
+										}
+										return 상태;
+									})
+									.collect(Collectors.toList());
+
+		List<ReqStateEntity> reqStateEntities = this.saveOrUpdateList(기본값_설정_상태목록);
+		return reqStateEntities;
 	}
 }

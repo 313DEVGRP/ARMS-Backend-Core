@@ -146,4 +146,15 @@ public class ReqStateController extends TreeAbstractController<ReqState, ReqStat
 
         return ResponseEntity.ok(카테고리_매핑된_상태목록);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/defaultSetting.do", method = RequestMethod.PUT)
+    public ResponseEntity<?> 기본_상태_설정(ReqStateDTO reqStateDTO) throws Exception {
+
+        log.info("ReqStateController :: defaultSetting");
+        ReqStateEntity reqStateEntity = modelMapper.map(reqStateDTO, ReqStateEntity.class);
+
+        List<ReqStateEntity> reqStateEntities = reqState.기본_상태_설정(reqStateEntity);
+        return ResponseEntity.ok(reqStateEntities);
+    }
 }
