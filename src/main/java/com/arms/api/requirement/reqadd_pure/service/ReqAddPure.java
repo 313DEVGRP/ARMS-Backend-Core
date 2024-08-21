@@ -20,4 +20,5 @@ public interface ReqAddPure extends TreeService {
 
     public ReqAddPureEntity moveReqNode(ReqAddPureEntity reqAddEntity, String changeReqTableName, HttpServletRequest request) throws Exception;
 
+    int updateDrawDB(String changeReqTableName, Long id, String drawDBContents);
 }
