@@ -9,5 +9,5 @@ import java.util.List;
 public interface FullDataService {
 
     List<FullDataAssigneesResponse> getAssignees(FullDataRequestDTO fullDataRequestDTO);
-    List<지라이슈> getExcelData(FullDataRequestDTO fullDataRequestDTO);
+    List<지라이슈> getExcelData(FullDataRequestDTO fullDataRequestDTO) throws Exception;
 }

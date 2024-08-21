@@ -31,7 +31,8 @@ public class FullDataController {
     }
 
     @GetMapping("/excel-data")
-    public ResponseEntity<CommonResponse.ApiResult<List<지라이슈>>> getExcelData(@Validated FullDataRequestDTO fullDataRequestDTO) {
+    public ResponseEntity<CommonResponse.ApiResult<List<지라이슈>>> getExcelData(@Validated FullDataRequestDTO fullDataRequestDTO) throws
+        Exception {
         List<지라이슈> response = fullDataService.getExcelData(fullDataRequestDTO);
         return ResponseEntity.ok(CommonResponse.success(response));
     }
