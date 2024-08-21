@@ -13,10 +13,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FullDataRequestDTO {
+
+    private int size;
+
+    private int page;
+
     @NotNull private Long pdServiceId;
+
     private List<Long> pdServiceVersionIds;
+
     private List<Long> almProjectIds;
+
     private String startDate;
+
     private String endDate;
-    private String accountId;
+
+    private String [] emailAddress;
+
 }
