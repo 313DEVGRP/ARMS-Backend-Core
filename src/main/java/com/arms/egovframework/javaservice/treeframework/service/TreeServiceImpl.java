@@ -562,24 +562,31 @@ public class TreeServiceImpl implements TreeService {
     @Transactional(rollbackFor = {Exception.class}, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
     public <T extends TreeSearchEntity> int updateField(T treeSearchEntity, String field) throws Exception {
 
-        Assert.notNull(field, "field is null");
+        Assert.hasText(field, "Field must not be null or empty.");
 
-        for(Field reflectionField : ReflectionUtils.getAllFields(treeSearchEntity.getClass())) {
+        Set<Field> allFields = ReflectionUtils.getAllFields(treeSearchEntity.getClass());
 
-            reflectionField.setAccessible(true);
+        Optional<Field> optionalField = allFields.stream().filter(reflectionField -> field.equals(reflectionField.getName())).findFirst();
 
-            if(field.equals(reflectionField.getName())) {
-                treeDao.setClazz(treeSearchEntity.getClass());
-                treeDao.getCurrentSession().setCacheMode(CacheMode.IGNORE);
-                T alterTargetNode = (T) treeDao.getUnique(treeSearchEntity.getC_id());
+        if(optionalField.isPresent()) {
+            Field targetField = optionalField.get();
 
-                Object value = reflectionField.get(treeSearchEntity);
-                reflectionField.set(alterTargetNode, value);
-                treeDao.merge(alterTargetNode);
-                treeDao.update(alterTargetNode);
-                return 1;
-            }
+            targetField.setAccessible(true);
+
+            treeDao.setClazz(treeSearchEntity.getClass());
+            treeDao.getCurrentSession().setCacheMode(CacheMode.IGNORE);
+            T alterTargetNode = (T) treeDao.getUnique(treeSearchEntity.getC_id());
+
+            Object value = targetField.get(treeSearchEntity);
+
+            targetField.set(alterTargetNode, value);
+
+            treeDao.merge(alterTargetNode);
+            treeDao.update(alterTargetNode);
+
+            return 1;
         }
+
         return 0;
     }
 
