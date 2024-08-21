@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.unitils.util.ReflectionUtils;
 
@@ -554,6 +555,34 @@ public class TreeServiceImpl implements TreeService {
         return 1;
 
     }
+
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional(rollbackFor = {Exception.class}, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
+    public <T extends TreeSearchEntity> int updateField(T treeSearchEntity, String field) throws Exception {
+
+        Assert.notNull(field, "field is null");
+
+        for(Field reflectionField : ReflectionUtils.getAllFields(treeSearchEntity.getClass())) {
+
+            reflectionField.setAccessible(true);
+
+            if(field.equals(reflectionField.getName())) {
+                treeDao.setClazz(treeSearchEntity.getClass());
+                treeDao.getCurrentSession().setCacheMode(CacheMode.IGNORE);
+                T alterTargetNode = (T) treeDao.getUnique(treeSearchEntity.getC_id());
+
+                Object value = reflectionField.get(treeSearchEntity);
+                reflectionField.set(alterTargetNode, value);
+                treeDao.merge(alterTargetNode);
+                treeDao.update(alterTargetNode);
+                return 1;
+            }
+        }
+        return 0;
+    }
+
 
     @Transactional(rollbackFor = {Exception.class}, isolation = Isolation.SERIALIZABLE, propagation = Propagation.REQUIRED)
     public <T extends TreeSearchEntity> List<T> saveOrUpdateList(List<T> entities) throws Exception {

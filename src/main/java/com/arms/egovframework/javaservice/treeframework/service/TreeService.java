@@ -21,32 +21,34 @@ import java.util.function.Function;
 
 public interface TreeService {
 
-    public <T extends TreeSearchEntity> T getNode(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> T getNode(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> int updateNode(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> int updateNode(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> List<T> getChildNode(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> int updateField(T treeSearchEntity, String field) throws Exception;
 
-    public <T extends TreeSearchEntity> List<T> getChildNodeWithoutPaging(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> List<T> getChildNode(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> List<T> getPaginatedChildNode(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> List<T> getChildNodeWithoutPaging(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> List<T> getNodesWithoutRoot(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> List<T> getPaginatedChildNode(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity,K,V> Map<K,V> getNodesWithoutRootMap(T treeSearchEntity, Function<T, K> key, Function<T, V> value) throws Exception;
+    <T extends TreeSearchEntity> List<T> getNodesWithoutRoot(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> List<String> searchNode(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity,K,V> Map<K,V> getNodesWithoutRootMap(T treeSearchEntity, Function<T, K> key, Function<T, V> value) throws Exception;
 
-    public <T extends TreeSearchEntity> T addNode(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> List<String> searchNode(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> int overwriteNode(T toEntity,T fromEntity) throws Exception;
+    <T extends TreeSearchEntity> T addNode(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> int removeNode(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> int overwriteNode(T toEntity,T fromEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> int alterNode(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> int removeNode(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> int alterNodeType(T treeSearchEntity) throws Exception;
+    <T extends TreeSearchEntity> int alterNode(T treeSearchEntity) throws Exception;
 
-    public <T extends TreeSearchEntity> T moveNode(T treeSearchEntity, HttpServletRequest request) throws Exception;
+    <T extends TreeSearchEntity> int alterNodeType(T treeSearchEntity) throws Exception;
+
+    <T extends TreeSearchEntity> T moveNode(T treeSearchEntity, HttpServletRequest request) throws Exception;
 
 }

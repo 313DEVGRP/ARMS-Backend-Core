@@ -351,7 +351,7 @@ public class ReqAddPureController extends TreeAbstractController<ReqAddPure, Req
 
         ReqAddPureEntity reqAddPureEntity = modelMapper.map(reqAddPureDTO, ReqAddPureEntity.class);
 
-        int result = reqAddPure.updateDrawDB(changeReqTableName, reqAddPureEntity.getC_id(), reqAddPureEntity.getC_drawdb_contents());
+        int result = reqAddPure.updateDrawDB(reqAddPureEntity, changeReqTableName);
 
         return ResponseEntity.ok(CommonResponse.success(result));
 

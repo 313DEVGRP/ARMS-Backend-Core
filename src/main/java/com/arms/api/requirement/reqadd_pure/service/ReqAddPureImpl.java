@@ -50,9 +50,14 @@ public class ReqAddPureImpl extends TreeServiceImpl implements ReqAddPure {
 
 
 	@Override
-	public int updateDrawDB(String changeReqTableName, Long id, String drawDBContents) {
-		String sql = "UPDATE " + changeReqTableName + " SET c_drawdb_contents = ? WHERE c_id = ?";
+	@Transactional
+	public int updateDrawDB(ReqAddPureEntity reqAddPureEntity, String changeReqTableName) throws Exception {
+		SessionUtil.setAttribute("updateDrawDBContents",changeReqTableName);
 
-		return jdbcTemplate.update(sql, drawDBContents, id);
+		int result = updateField(reqAddPureEntity, "c_drawdb_contents");
+
+		SessionUtil.removeAttribute("updateDrawDBContents");
+
+		return result;
 	}
 }
