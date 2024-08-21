@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,10 +31,11 @@ public class FullDataController {
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 
-    @GetMapping("/excel-data")
-    public ResponseEntity<CommonResponse.ApiResult<List<지라이슈>>> getExcelData(@Validated FullDataRequestDTO fullDataRequestDTO) throws
-        Exception {
-        List<지라이슈> response = fullDataService.getExcelData(fullDataRequestDTO);
+    @GetMapping("/{changeReqTableName}/excel-data")
+    public ResponseEntity<CommonResponse.ApiResult<List<지라이슈>>> getExcelData(
+            @PathVariable(value = "changeReqTableName") String changeReqTableName,
+            @Validated FullDataRequestDTO fullDataRequestDTO) throws Exception {
+        List<지라이슈> response = fullDataService.getExcelData(changeReqTableName, fullDataRequestDTO);
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 

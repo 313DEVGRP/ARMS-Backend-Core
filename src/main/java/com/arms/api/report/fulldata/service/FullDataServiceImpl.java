@@ -22,8 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FullDataServiceImpl implements FullDataService {
 
-    private final PdService PdService;
-    // private PdService PdService;
+    private final PdService pdService;
 
     private final EngineService engineService;
 
@@ -36,13 +35,16 @@ public class FullDataServiceImpl implements FullDataService {
     }
 
     @Override
-    public List<지라이슈> getExcelData(FullDataRequestDTO fullDataRequestDTO) throws Exception {
-        SessionUtil.setAttribute("excel-data", "T_ARMS_REQADD_25");
+    public List<지라이슈> getExcelData(String changeReqTableName, FullDataRequestDTO fullDataRequestDTO) throws Exception {
+        SessionUtil.setAttribute("excel-data", changeReqTableName);
         ResponseEntity<List<지라이슈>> 이슈조회 = engineService.getExcelData(fullDataRequestDTO);
-        List<ReqAddEntity> nodesWithoutRoot1 = reqAdd.getChildNode(new ReqAddEntity());
-        System.out.println(nodesWithoutRoot1);
 
-        List<PdServiceEntity> nodesWithoutRoot = PdService.getNodesWithoutRoot(new PdServiceEntity());
+        ReqAddEntity reqAddEntity = new ReqAddEntity();
+        List<ReqAddEntity> nodesWithoutRoot1 = reqAdd.getChildNodeWithoutPaging(reqAddEntity);
+        log.info("[ FullDataServiceImpl :: getExcelData ] :: getChildNodeWithoutPaging start");
+        log.info(nodesWithoutRoot1.toString());
+
+        List<PdServiceEntity> nodesWithoutRoot = pdService.getNodesWithoutRoot(new PdServiceEntity());
         System.out.println(nodesWithoutRoot);
 
         SessionUtil.removeAttribute("excel-data");
