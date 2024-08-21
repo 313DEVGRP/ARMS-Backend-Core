@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ReqAddPureImpl extends TreeServiceImpl implements ReqAddPure {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	protected Chat chat;
@@ -44,5 +46,13 @@ public class ReqAddPureImpl extends TreeServiceImpl implements ReqAddPure {
 		SessionUtil.removeAttribute("moveNode");
 
 		return savedReqAddPureEntity;
+	}
+
+
+	@Override
+	public int updateDrawDB(String changeReqTableName, Long id, String drawDBContents) {
+		String sql = "UPDATE " + changeReqTableName + " SET c_drawdb_contents = ? WHERE c_id = ?";
+
+		return jdbcTemplate.update(sql, drawDBContents, id);
 	}
 }

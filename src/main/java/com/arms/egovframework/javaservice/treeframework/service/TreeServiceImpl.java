@@ -530,8 +530,7 @@ public class TreeServiceImpl implements TreeService {
                 "c_issue_delete_date",
                 "c_etc",
                 "c_req_state_mapping_link",
-                "reqStateCategoryEntity",
-                "c_drawdb_contents"
+                "reqStateCategoryEntity"
         ));
 
         treeDao.setClazz(treeSearchEntity.getClass());
@@ -545,7 +544,6 @@ public class TreeServiceImpl implements TreeService {
             Object value = field.get(treeSearchEntity);
 
             if (fieldsToAlwaysUpdate.contains(field.getName()) || !ObjectUtils.isEmpty(value)) {
-                field.setAccessible(true);
                 field.set(alterTargetNode, value);
             }
         }
