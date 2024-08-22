@@ -26,7 +26,7 @@ public class FullDataController {
 
 
     @GetMapping("/assignees")
-    public ResponseEntity<CommonResponse.ApiResult<List<FullDataAssigneesResponse>>> getAssignees(@Validated FullDataRequestDTO fullDataRequestDTO) {
+    public ResponseEntity<CommonResponse.ApiResult<List<FullDataAssigneesResponse>>> getAssignees(@Validated FullDataRequestDTO fullDataRequestDTO) throws Exception {
         List<FullDataAssigneesResponse> response = fullDataService.getAssignees(fullDataRequestDTO);
         return ResponseEntity.ok(CommonResponse.success(response));
     }

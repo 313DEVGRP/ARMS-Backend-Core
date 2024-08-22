@@ -34,16 +34,16 @@ public class FullDataServiceImpl implements FullDataService {
 
     private final JiraProjectPure jiraProjectPure;
     @Override
-    public List<FullDataAssigneesResponse> getAssignees(FullDataRequestDTO fullDataRequestDTO) {
+    public List<FullDataAssigneesResponse> getAssignees(FullDataRequestDTO fullDataRequestDTO) throws Exception {
+        List<JiraProjectPureEntity> almProjects = jiraProjectPure.getJiraProjects(fullDataRequestDTO.getAlmProjectIds());
+        List<String> almProjectUrls = almProjects.stream().map(JiraProjectPureEntity::getC_jira_url).collect(Collectors.toList());
+        fullDataRequestDTO.setAlmProjectUrls(almProjectUrls);
         ResponseEntity<List<FullDataAssigneesResponse>> fullDataReportAssignees = engineService.getAssignees(fullDataRequestDTO);
         return fullDataReportAssignees.getBody();
     }
 
     @Override
     public List<지라이슈> getExcelData(String changeReqTableName, FullDataRequestDTO fullDataRequestDTO) throws Exception {
-//        List<JiraProjectPureEntity> almProjects = jiraProjectPure.getJiraProjects(fullDataRequestDTO.getAlmProjectIds());
-//        List<String> almProjectUrls = almProjects.stream().map(JiraProjectPureEntity::getC_jira_url).collect(Collectors.toList());
-//        fullDataRequestDTO.setAlmProjectUrls(almProjectUrls);
         SessionUtil.setAttribute("excel-data", changeReqTableName);
         ResponseEntity<List<지라이슈>> 이슈조회 = engineService.getExcelData(fullDataRequestDTO);
 
