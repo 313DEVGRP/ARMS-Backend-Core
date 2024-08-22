@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service("FullDataService")
@@ -40,14 +42,14 @@ public class FullDataServiceImpl implements FullDataService {
         ResponseEntity<List<지라이슈>> 이슈조회 = engineService.getExcelData(fullDataRequestDTO);
 
         ReqAddEntity reqAddEntity = new ReqAddEntity();
-        List<ReqAddEntity> nodesWithoutRoot1 = reqAdd.getChildNodeWithoutPaging(reqAddEntity);
-        log.info("[ FullDataServiceImpl :: getExcelData ] :: getChildNodeWithoutPaging start");
-        log.info(nodesWithoutRoot1.toString());
+        Map<Long, ReqAddEntity> reqAddEntityMap = reqAdd.getChildNodeWithoutPaging(reqAddEntity)
+                .stream().collect(Collectors.toMap(ReqAddEntity::getC_id, a -> a));
 
-        List<PdServiceEntity> nodesWithoutRoot = pdService.getNodesWithoutRoot(new PdServiceEntity());
-        System.out.println(nodesWithoutRoot);
+        log.info("[ FullDataServiceImpl :: getExcelData ] :: getChildNodeWithoutPaging start");
+        System.out.println(reqAddEntityMap);
 
         SessionUtil.removeAttribute("excel-data");
+
         return 이슈조회.getBody();
     }
 }
