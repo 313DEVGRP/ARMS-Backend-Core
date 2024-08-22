@@ -19,4 +19,6 @@ import java.util.List;
 public interface JiraProjectPure extends TreeService {
 
     List<JiraProjectPureEntity> getJiraProjects(Long pdServiceId, List<Long> pdServiceVersionIds) throws Exception;
+
+    List<JiraProjectPureEntity> getJiraProjects(List<Long> ids) throws Exception;
 }

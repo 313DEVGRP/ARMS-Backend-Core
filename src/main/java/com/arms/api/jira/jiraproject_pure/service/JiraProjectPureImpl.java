@@ -62,4 +62,20 @@ public class JiraProjectPureImpl extends TreeServiceImpl implements JiraProjectP
 
         return getChildNode(jiraProjectPureEntity);
     }
+
+    @Override
+    public List<JiraProjectPureEntity> getJiraProjects(List<Long> ids) throws Exception {
+
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        JiraProjectPureEntity jiraProjectPureEntity = new JiraProjectPureEntity();
+
+        Criterion criterion = Restrictions.in("c_id", ids);
+
+        jiraProjectPureEntity.getCriterions().add(criterion);
+
+        return getChildNode(jiraProjectPureEntity);
+    }
 }

@@ -24,6 +24,8 @@ public class FullDataRequestDTO {
 
     private List<Long> almProjectIds;
 
+    private List<String> almProjectUrls;
+
     private String startDate;
 
     private String endDate;
