@@ -1,5 +1,6 @@
 package com.arms.api.report.fulldata.controller;
 
+import com.arms.api.report.fulldata.model.ExcelDataDTO;
 import com.arms.api.report.fulldata.model.FullDataAssigneesResponse;
 import com.arms.api.report.fulldata.model.FullDataRequestDTO;
 import com.arms.api.report.fulldata.service.FullDataService;
@@ -32,10 +33,10 @@ public class FullDataController {
     }
 
     @GetMapping("/{changeReqTableName}/excel-data")
-    public ResponseEntity<CommonResponse.ApiResult<List<지라이슈>>> getExcelData(
+    public ResponseEntity<CommonResponse.ApiResult<List<ExcelDataDTO>>> getExcelData(
             @PathVariable(value = "changeReqTableName") String changeReqTableName,
             @Validated FullDataRequestDTO fullDataRequestDTO) throws Exception {
-        List<지라이슈> response = fullDataService.getExcelData(changeReqTableName, fullDataRequestDTO);
+        List<ExcelDataDTO> response = fullDataService.getExcelData(changeReqTableName, fullDataRequestDTO);
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 

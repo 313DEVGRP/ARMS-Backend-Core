@@ -4,6 +4,7 @@ import com.arms.api.analysis.common.model.AggregationRequestDTO;
 import com.arms.api.jira.jiraserver.model.계정정보_데이터;
 import com.arms.api.report.fulldata.model.FullDataAssigneesResponse;
 import com.arms.api.report.fulldata.model.FullDataRequestDTO;
+import com.arms.api.report.fulldata.model.FullDataResponseDTO;
 import com.arms.api.util.communicate.external.request.지라서버정보_데이터;
 import com.arms.api.util.communicate.external.response.aggregation.검색결과;
 import com.arms.api.util.communicate.external.response.jira.*;
@@ -191,5 +192,5 @@ public interface EngineService {
      *  요구사항 묶음 조회(함께 생성된 요구사항 이슈 모두 조회)
      * */
     @GetMapping("/engine/report/issue-list")
-    ResponseEntity<List<지라이슈>> getExcelData(@SpringQueryMap FullDataRequestDTO fullDataRequestDTO);
+    ResponseEntity<FullDataResponseDTO> getExcelData(@SpringQueryMap FullDataRequestDTO fullDataRequestDTO);
 }
