@@ -23,7 +23,6 @@ import com.arms.egovframework.javaservice.treeframework.validation.group.AddNode
 import com.arms.egovframework.javaservice.treeframework.validation.group.RemoveNode;
 import com.arms.egovframework.javaservice.treeframework.validation.group.UpdateNode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,7 +163,6 @@ public class ReqStateController extends TreeAbstractController<ReqState, ReqStat
         // 매핑된 카테고리가 있는 상태만 필터링 및 카테고리 아이디 오름차순 정렬
         List<ReqStateEntity> 카테고리_매핑된_상태목록 = 전체_상태목록.stream()
                                                         .filter(Objects::nonNull)
-                                                        .filter(reqState -> StringUtils.equals(reqState.getC_check(), "true"))
                                                         .filter(reqState -> reqState.getReqStateCategoryEntity() != null)
                                                         .sorted((state1, state2) -> Long.compare(
                                                                 state1.getReqStateCategoryEntity().getC_id(),
