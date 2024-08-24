@@ -92,6 +92,8 @@ public class FullDataServiceImpl implements FullDataService {
         for (지라이슈 issue : ALM_이슈목록) {
             ReqAddPureEntity reqAddEntityValue = reqAddPureEntityMap.get(issue.getCReqLink());
 
+            if (reqAddEntityValue == null) { continue; }
+
             // 버전명 :: 버전A (시작일 ~ 종료일), 버전B (시작일 ~ 종료일), ...
             Long[] pdServiceVersions = issue.getPdServiceVersions();
 
@@ -112,6 +114,12 @@ public class FullDataServiceImpl implements FullDataService {
             } else {
                 버전명 = " - "; // 가져온 버전 정보가 없을 경우 - 처리
             }
+
+            String deletedDate = "";
+            if (issue.getDeleted() != null ) {
+                deletedDate = Optional.ofNullable(issue.getDeleted().getIsDeleted() ? issue.getDeleted().getDate() : "").orElse("");
+            }
+
             // 버전명 세팅 종료
             ExcelDataDTO excelData = ExcelDataDTO.builder()
                     .pdServiceId(issue.getPdServiceId()) // 검토
@@ -131,14 +139,13 @@ public class FullDataServiceImpl implements FullDataService {
                     .issueTitle(issue.getSummary())
                     .issueStatus(issue.getStatus().getName())
                     .assigneeName(Optional.ofNullable(issue.getAssignee()).map(지라이슈.담당자::getDisplayName).orElse("담당자 정보 없음"))
-                    .assigneeEmail(Optional.ofNullable(issue.getAssignee()).map(지라이슈.담당자::getEmailAddress).orElse("담당자 정보 없음"))
+                    .assigneeEmail(Optional.ofNullable(issue.getAssignee()).map(지라이슈.담당자::getEmailAddress).orElse(""))
 
                     // 생성일 수정일 해결일 삭제일(있다면)
                     .createDate(Optional.ofNullable(issue.getCreated()).orElse(""))
                     .updatedDate(Optional.ofNullable(issue.getUpdated()).orElse(""))
                     .resolutionDate(Optional.ofNullable(issue.getResolutiondate()).orElse(""))
-                    .deletedDate(Optional.ofNullable(issue.getDeleted().getIsDeleted()? issue.getDeleted().getDate() : "").orElse(""))
-
+                    .deletedDate(deletedDate)
                     .build();
 
             excelDataList.add(excelData);
