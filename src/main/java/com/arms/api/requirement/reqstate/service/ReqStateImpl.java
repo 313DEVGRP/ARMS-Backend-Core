@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -57,7 +58,7 @@ public class ReqStateImpl extends TreeServiceImpl implements ReqState{
 
 		List<ReqStateEntity> 기본값_설정_상태목록 = 전체상태목록.stream()
 									.map(상태 -> {
-										if (reqStateEntity.getC_id() == 상태.getC_id()) {
+										if (Objects.equals(reqStateEntity.getC_id(), 상태.getC_id())) {
 											상태.setC_check("true");
 										}
 										else {

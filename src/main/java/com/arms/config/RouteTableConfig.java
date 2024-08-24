@@ -34,6 +34,8 @@ public class RouteTableConfig {
         map.put("updateDrawIOContents.do", "updateDrawIOContents");
         map.put("updateDrawDBContents.do", "updateDrawDBContents");
         map.put("excel-data", "excel-data");
+        map.put("updateReqAddState.do", "updateReqAddState");
+
         return map;
     }
 

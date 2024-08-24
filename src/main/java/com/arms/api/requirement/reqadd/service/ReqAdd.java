@@ -14,6 +14,7 @@ package com.arms.api.requirement.reqadd.service;
 import com.arms.api.product_service.pdservice.model.PdServiceEntity;
 import com.arms.api.requirement.reqadd.model.*;
 import com.arms.api.requirement.reqadd.model.요구사항별_담당자_목록.요구사항_담당자;
+import com.arms.api.requirement.reqadd_pure.model.ReqAddPureEntity;
 import com.arms.egovframework.javaservice.treeframework.service.TreeService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,4 +43,9 @@ public interface ReqAdd extends TreeService {
     public void 요구사항_삭제_이후_상태정보_처리_프로세스(String changeReqTableName, ReqAddEntity savedReqAddEntity, LoadReqAddDTO loadReqAddDTO) throws Exception;
 
     public void 요구사항_상태_디비_업데이트(ReqAddEntity reqAddEntity, String changeReqTableName) throws Exception;
+
+    public void 상태삭제_후_전체_요구사항_상태변경(Long 변경_전_상태아이디, Long 변경_후_상태아이디) throws Exception;
+
+    public List<ReqAddPureEntity> 요구사항_상태변경(Long 변경_전_상태아이디, Long 변경할_상태아이디) throws Exception;
+
 }

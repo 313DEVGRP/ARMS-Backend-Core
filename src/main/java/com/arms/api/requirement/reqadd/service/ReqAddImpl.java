@@ -29,6 +29,7 @@ import com.arms.api.requirement.reqadd.model.LoadReqAddDTO;
 import com.arms.api.requirement.reqadd.model.ReqAddDetailDTO;
 import com.arms.api.requirement.reqadd.model.ReqAddEntity;
 import com.arms.api.requirement.reqadd.model.요구사항별_담당자_목록.요구사항_담당자;
+import com.arms.api.requirement.reqadd_pure.model.ReqAddPureEntity;
 import com.arms.api.requirement.reqstatus.model.CRUDType;
 import com.arms.api.requirement.reqstatus.model.ReqStatusDTO;
 import com.arms.api.requirement.reqstatus.model.ReqStatusEntity;
@@ -46,6 +47,8 @@ import com.arms.egovframework.javaservice.treeframework.util.DateUtils;
 import com.arms.egovframework.javaservice.treeframework.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 import org.modelmapper.ModelMapper;
@@ -54,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -807,5 +811,49 @@ public class ReqAddImpl extends TreeServiceImpl implements ReqAdd {
 		Set<Long> 삭제된버전 = new HashSet<>(현재버전);
 		삭제된버전.removeAll(수정할버전);
 		return 삭제된버전;
+	}
+
+	@Async
+	public void 상태삭제_후_전체_요구사항_상태변경(Long 변경_전_상태아이디, Long 변경_후_상태아이디) throws Exception {
+		// 제품 조회
+		PdServiceEntity 제품서비스_조회 = new PdServiceEntity();
+		List<PdServiceEntity> 제품서비스_리스트 = pdService.getNodesWithoutRoot(제품서비스_조회);
+
+		for (PdServiceEntity 제품서비스 : 제품서비스_리스트) {
+			Long 제품서비스_아이디 = 제품서비스.getC_id();
+
+			ResponseEntity<?> 결과 = internalService.전체_요구사항_상태변경(TreeConstant.REQADD_PREFIX_TABLENAME + 제품서비스_아이디,
+																			변경_전_상태아이디, 변경_후_상태아이디);
+
+			if (!결과.getStatusCode().is2xxSuccessful()) {
+				logger.error(결과.getStatusCodeValue() + " : " + 결과.getBody());
+			}
+		}
+	}
+
+	@Transactional
+	public List<ReqAddPureEntity> 요구사항_상태변경(Long 변경_전_상태아이디, Long 변경할_상태아이디) throws Exception {
+
+		ReqAddPureEntity reqAddPureEntity = new ReqAddPureEntity();
+		Criterion criterion1 = Restrictions.eq("c_type", TreeConstant.Leaf_Node_TYPE);
+		Criterion criterion2 = Restrictions.eq("c_req_state_link", 변경_전_상태아이디);
+		Criterion criterion = Restrictions.and(criterion1, criterion2);
+		reqAddPureEntity.getCriterions().add(criterion);
+		List<ReqAddPureEntity> 전체_요구사항목록 = this.getNodesWithoutRoot(reqAddPureEntity);
+
+		List<ReqAddPureEntity> 상태변경_요구사항목록 = 전체_요구사항목록.stream()
+														.map(요구사항 -> {
+															if (요구사항.getC_req_state_link() == null || Objects.equals(요구사항.getC_req_state_link(), 변경_전_상태아이디)) {
+																요구사항.setC_req_state_link(변경할_상태아이디);
+																return 요구사항;
+															}
+															return null;
+														})
+														.filter(Objects::nonNull)
+														.collect(Collectors.toList());
+
+		List<ReqAddPureEntity> reqAddEntities = this.saveOrUpdateList(상태변경_요구사항목록);
+
+		return reqAddEntities;
 	}
 }
