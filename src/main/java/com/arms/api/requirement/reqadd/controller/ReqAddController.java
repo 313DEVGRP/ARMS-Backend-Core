@@ -19,6 +19,7 @@ import com.arms.api.requirement.reqadd.excelupload.ExcelGantUpload;
 import com.arms.api.requirement.reqadd.excelupload.WbsSchedule;
 import com.arms.api.requirement.reqadd.model.*;
 import com.arms.api.requirement.reqadd.service.ReqAdd;
+import com.arms.api.requirement.reqadd_pure.model.ReqAddPureEntity;
 import com.arms.api.requirement.reqdifficulty.model.ReqDifficultyEntity;
 import com.arms.api.requirement.reqdifficulty.service.ReqDifficulty;
 import com.arms.api.requirement.reqpriority.model.ReqPriorityEntity;
@@ -771,4 +772,23 @@ public class ReqAddController extends TreeAbstractController<ReqAdd, ReqAddDTO, 
 
         return ResponseEntity.ok(CommonResponse.success(result));
     }
+
+    @ResponseBody
+    @RequestMapping(
+            value = {"/{changeReqTableName}/updateReqAddState.do"},
+            method = {RequestMethod.PUT}
+    )
+    public ResponseEntity<?> updateReqState(
+            @PathVariable(value = "changeReqTableName") String changeReqTableName,
+            @RequestParam(value = "stateBeforeChange") Long 변경_전_상태아이디,
+            @RequestParam(value = "stateAfterChange") Long 변경_후_상태아이디) throws Exception {
+
+        log.info("ReqAddController :: updateReqAddState");
+        SessionUtil.setAttribute("updateReqAddState", changeReqTableName);
+        List<ReqAddPureEntity> 요구사항_상태변경 = reqAdd.요구사항_상태변경(변경_전_상태아이디, 변경_후_상태아이디);
+        SessionUtil.removeAttribute("updateReqAddState");
+
+        return ResponseEntity.ok(CommonResponse.success(요구사항_상태변경));
+    }
+
 }

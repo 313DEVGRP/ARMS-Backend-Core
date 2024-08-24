@@ -12,6 +12,7 @@
 package com.arms.api.requirement.reqstate.controller;
 
 
+import com.arms.api.requirement.reqadd.service.ReqAdd;
 import com.arms.api.requirement.reqstate.model.ReqStateDTO;
 import com.arms.api.requirement.reqstate.model.ReqStateEntity;
 import com.arms.api.requirement.reqstate.service.ReqState;
@@ -19,8 +20,10 @@ import com.arms.api.requirement.reqstate_category.model.ReqStateCategoryEntity;
 import com.arms.api.requirement.reqstate_category.service.ReqStateCategory;
 import com.arms.egovframework.javaservice.treeframework.controller.TreeAbstractController;
 import com.arms.egovframework.javaservice.treeframework.validation.group.AddNode;
+import com.arms.egovframework.javaservice.treeframework.validation.group.RemoveNode;
 import com.arms.egovframework.javaservice.treeframework.validation.group.UpdateNode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -60,6 +64,10 @@ public class ReqStateController extends TreeAbstractController<ReqState, ReqStat
     @Autowired
     @Qualifier("reqStateCategory")
     private ReqStateCategory reqStateCategory;
+
+    @Autowired
+    @Qualifier("reqAdd")
+    private ReqAdd reqAdd;
 
     @ResponseBody
     @RequestMapping(value = "/addStateNode.do", method = RequestMethod.POST)
@@ -106,6 +114,25 @@ public class ReqStateController extends TreeAbstractController<ReqState, ReqStat
     }
 
     @ResponseBody
+    @RequestMapping(value = "/removeNodeAndChangeState.do", method = RequestMethod.DELETE)
+    public ModelAndView removeNodeAndChangeState(@Validated(value = RemoveNode.class) ReqStateDTO reqStateDTO,
+                                   @RequestParam(value = "stateIdToChange") Long stateIdToChagne,
+                                   BindingResult bindingResult, ModelMap model) throws Exception {
+
+        log.info("ReqStateController :: removeNodeAndChangeState");
+        ReqStateEntity reqStateEntity = modelMapper.map(reqStateDTO, ReqStateEntity.class);
+
+        reqStateEntity.setStatus(reqState.removeNode(reqStateEntity));
+        setJsonDefaultSetting(reqStateEntity);
+
+        reqAdd.상태삭제_후_전체_요구사항_상태변경(reqStateEntity.getC_id(), stateIdToChagne);
+
+        ModelAndView modelAndView = new ModelAndView("jsonView");
+        modelAndView.addObject("result", reqStateEntity);
+        return modelAndView;
+    }
+
+    @ResponseBody
     @RequestMapping(
             value = {"/complete-keyword"},
             method = {RequestMethod.GET}
@@ -137,6 +164,7 @@ public class ReqStateController extends TreeAbstractController<ReqState, ReqStat
         // 매핑된 카테고리가 있는 상태만 필터링 및 카테고리 아이디 오름차순 정렬
         List<ReqStateEntity> 카테고리_매핑된_상태목록 = 전체_상태목록.stream()
                                                         .filter(Objects::nonNull)
+                                                        .filter(reqState -> StringUtils.equals(reqState.getC_check(), "true"))
                                                         .filter(reqState -> reqState.getReqStateCategoryEntity() != null)
                                                         .sorted((state1, state2) -> Long.compare(
                                                                 state1.getReqStateCategoryEntity().getC_id(),

@@ -28,6 +28,10 @@ public interface InternalService {
     ResponseEntity<?> 요구사항_수정하기(@PathVariable(value = "changeReqTableName") String changeReqTableName,
                                 @RequestBody ReqAddDTO reqAddDTO);
 
+    @PutMapping("/arms/reqAdd/{changeReqTableName}/updateReqAddState.do")
+    ResponseEntity<?> 전체_요구사항_상태변경(@PathVariable(value = "changeReqTableName") String changeReqTableName,
+                                @RequestParam Long stateBeforeChange, @RequestParam Long stateAfterChange);
+
     @PostMapping("/arms/reqStatus/{changeReqTableName}/addStatusNode.do")
     ResponseEntity<?> 요구사항_상태_정보_저장하기(@PathVariable(value = "changeReqTableName") String changeReqTableName,
                                       @RequestBody ReqStatusDTO reqStatusDTO);
