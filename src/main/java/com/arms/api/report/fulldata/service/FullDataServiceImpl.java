@@ -55,6 +55,13 @@ public class FullDataServiceImpl implements FullDataService {
 
     @Override
     public List<ExcelDataDTO> getExcelData(String changeReqTableName, FullDataRequestDTO fullDataRequestDTO) throws Exception {
+        List<Long> almProjectList = Optional.ofNullable(fullDataRequestDTO.getAlmProjectIds()).orElse(Collections.emptyList());
+        if(!almProjectList.isEmpty()) {
+            List<JiraProjectPureEntity> almProjects = jiraProjectPure.getJiraProjects(fullDataRequestDTO.getAlmProjectIds());
+            List<String> almProjectUrls = almProjects.stream().map(JiraProjectPureEntity::getC_jira_url).collect(Collectors.toList());
+            fullDataRequestDTO.setAlmProjectUrls(almProjectUrls);
+        }
+
         // 반환할 엑셀 데이터 리스트
         List<ExcelDataDTO> excelDataList = new ArrayList<>();
 
