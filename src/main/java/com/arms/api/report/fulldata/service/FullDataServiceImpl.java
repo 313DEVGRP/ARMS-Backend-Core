@@ -88,6 +88,9 @@ public class FullDataServiceImpl implements FullDataService {
             return excelDataList;
         }
 
+        List<ExcelDataDTO> reqDataList = new ArrayList<>();
+        List<ExcelDataDTO> subDataList = new ArrayList<>();
+
 
         for (지라이슈 issue : ALM_이슈목록) {
             ReqAddPureEntity reqAddEntityValue = reqAddPureEntityMap.get(issue.getCReqLink());
@@ -129,12 +132,17 @@ public class FullDataServiceImpl implements FullDataService {
 
                     // 요구사항 구분을 위해
                     .isReq(issue.getIsReq())
+                    .parentReqKey(Optional.ofNullable(issue.getParentReqKey()).orElse(""))
+                    .upperKey(Optional.ofNullable(issue.getUpperKey()).orElse(""))
                     .etc(issue.etcBoolean())
+
                     .cReqLink(issue.getCReqLink()) // 검토
                     .reqTitle(reqAddEntityValue.getC_title()) // 요구사항
                     .reqState(요구사항_상태_맵.get(reqAddEntityValue.getC_req_state_link())) // 요구사항 상태
 
                     .almProjectName(issue.getProject().getName())
+                    .key(issue.getKey())
+                    .issueID(issue.getIssueID())
                     .issueTitle(issue.getSummary())
                     .issueStatus(issue.getStatus().getName())
                     .assigneeName(Optional.ofNullable(issue.getAssignee()).map(지라이슈.담당자::getDisplayName).orElse("담당자 정보 없음"))
@@ -147,9 +155,13 @@ public class FullDataServiceImpl implements FullDataService {
                     .deletedDate(deletedDate)
                     .build();
 
-            excelDataList.add(excelData);
+            if (issue.getIsReq().equals(true)) {
+                reqDataList.add(excelData);
+            } else {
+                subDataList.add(excelData);
+            }
+            //excelDataList.add(excelData);
         }
-
 
 
         log.info("[ FullDataServiceImpl :: getExcelData ] :: issue size => {}", ALM_이슈목록.size());

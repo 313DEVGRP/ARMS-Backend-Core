@@ -19,13 +19,14 @@ public class ExcelDataDTO {
     private Boolean isReq;
     private Boolean etc;
 
+    private String issueID;
+    private String key;
     private String parentReqKey;
     private String upperKey;
 
     private String isReqName;
 
     private String almProjectName;
-
 
     private Long cReqLink;
     private String reqTitle;
