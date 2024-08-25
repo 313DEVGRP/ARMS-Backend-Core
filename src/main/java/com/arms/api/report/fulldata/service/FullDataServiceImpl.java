@@ -55,6 +55,7 @@ public class FullDataServiceImpl implements FullDataService {
 
     @Override
     public List<ExcelDataDTO> getExcelData(String changeReqTableName, FullDataRequestDTO fullDataRequestDTO) throws Exception {
+        // 반환할 엑셀 데이터 리스트
         List<ExcelDataDTO> excelDataList = new ArrayList<>();
 
         SessionUtil.setAttribute("excel-data", changeReqTableName);
@@ -88,9 +89,10 @@ public class FullDataServiceImpl implements FullDataService {
             return excelDataList;
         }
 
-        List<ExcelDataDTO> reqDataList = new ArrayList<>();
+        // isReq false 데이터 리스트
         List<ExcelDataDTO> subDataList = new ArrayList<>();
-
+        // isReq true - key 및 idx Map
+        Map<String, Integer> reqKeyIndexMap = new HashMap<>();
 
         for (지라이슈 issue : ALM_이슈목록) {
             ReqAddPureEntity reqAddEntityValue = reqAddPureEntityMap.get(issue.getCReqLink());
@@ -156,13 +158,26 @@ public class FullDataServiceImpl implements FullDataService {
                     .build();
 
             if (issue.getIsReq().equals(true)) {
-                reqDataList.add(excelData);
+                excelDataList.add(excelData);
+                reqKeyIndexMap.put(excelData.getKey(), excelDataList.size() - 1);
             } else {
                 subDataList.add(excelData);
             }
-            //excelDataList.add(excelData);
         }
 
+        // 요구사항 - 하위이슈 순으로 재배열
+        for (ExcelDataDTO subData : subDataList) {
+            String parentReqKey = subData.getParentReqKey();
+            if (parentReqKey != null && reqKeyIndexMap.containsKey(parentReqKey)) {
+                int index = reqKeyIndexMap.get(subData.getParentReqKey());
+                // 요소를 index+1 위치에 삽입
+                excelDataList.add(index + 1, subData);
+                // 맵 갱신 (삽입된 요소 이후의 인덱스들이 변화하므로)
+                for (int i = index + 1; i < excelDataList.size(); i++) {
+                    reqKeyIndexMap.put(excelDataList.get(i).getKey(), i);
+                }
+            }
+        }
 
         log.info("[ FullDataServiceImpl :: getExcelData ] :: issue size => {}", ALM_이슈목록.size());
         log.info("[ FullDataServiceImpl :: getExcelData ] :: excelData size => {}", excelDataList.size());
@@ -195,4 +210,5 @@ public class FullDataServiceImpl implements FullDataService {
 
         return 버전키_이름및일정_맵;
     }
+
 }
