@@ -30,6 +30,6 @@ public class FullDataRequestDTO {
 
     private String endDate;
 
-    private String [] emailAddress;
+    private List<String> emailAddress;
 
 }
