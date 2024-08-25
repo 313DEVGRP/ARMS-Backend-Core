@@ -102,25 +102,16 @@ public class FullDataServiceImpl implements FullDataService {
             // 버전명 :: 버전A (시작일 ~ 종료일), 버전B (시작일 ~ 종료일), ...
             Long[] pdServiceVersions = issue.getPdServiceVersions();
 
-            String 버전명 = "";
-            if (pdServiceVersions != null) {
-
-                StringBuilder sb = new StringBuilder();
-
-                for (Long versionId : pdServiceVersions) {
-                    if (버전아이디_이름및일정_맵.containsKey(versionId)) {
-                        if (sb.length() > 0) {
-                            sb.append(",");
-                        }
-                        sb.append(버전아이디_이름및일정_맵.get(versionId));
-                    }
-                }
-                버전명 = sb.toString();
-            } else {
-                버전명 = " - "; // 가져온 버전 정보가 없을 경우 - 처리
-            }
+            String 버전명
+                = Optional.ofNullable(pdServiceVersions)
+                    .map(versions->Arrays.stream(versions)
+                            .filter(버전아이디_이름및일정_맵::containsKey)
+                            .map(String::valueOf)
+                            .collect(Collectors.joining(",")))
+                    .orElse(" - ");
 
             String deletedDate = "";
+
             if (issue.getDeleted() != null ) {
                 deletedDate = Optional.ofNullable(issue.getDeleted().getIsDeleted() ? issue.getDeleted().getDate() : "").orElse("");
             }
