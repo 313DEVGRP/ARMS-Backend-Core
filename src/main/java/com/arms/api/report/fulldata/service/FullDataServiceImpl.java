@@ -110,11 +110,7 @@ public class FullDataServiceImpl implements FullDataService {
                             .collect(Collectors.joining(",")))
                     .orElse(" - ");
 
-            String deletedDate = "";
-
-            if (issue.getDeleted() != null ) {
-                deletedDate = Optional.ofNullable(issue.getDeleted().getIsDeleted() ? issue.getDeleted().getDate() : "").orElse("");
-            }
+            String deletedDate = issue.지라이슈_삭제_일자_가져오기();
 
             // 버전명 세팅 종료
             ExcelDataDTO excelData = ExcelDataDTO.builder()

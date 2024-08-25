@@ -50,6 +50,13 @@ public class 지라이슈 {
 
     private 지라이슈.삭제 deleted;
 
+    public String 지라이슈_삭제_일자_가져오기(){
+        if(deleted == null){
+            return "";
+        }
+        return deleted.삭제되었으면_일자리턴();
+    }
+
     private List<지라이슈.워크로그> worklogs;
 
     private Integer timespent;
@@ -89,6 +96,14 @@ public class 지라이슈 {
 
         @JsonProperty("deleted_date")
         private String date;
+
+        public String 삭제되었으면_일자리턴(){
+            if(isDeleted){
+                return date;
+            }else{
+                return "";
+            }
+        }
     }
     @Getter
     @Setter
