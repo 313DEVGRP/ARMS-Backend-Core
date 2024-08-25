@@ -129,8 +129,7 @@ public class FullDataServiceImpl implements FullDataService {
 
                     // 요구사항 구분을 위해
                     .isReq(issue.getIsReq())
-                    .etc((Boolean) issue.getEtc())
-
+                    .etc(issue.etcBoolean())
                     .cReqLink(issue.getCReqLink()) // 검토
                     .reqTitle(reqAddEntityValue.getC_title()) // 요구사항
                     .reqState(요구사항_상태_맵.get(reqAddEntityValue.getC_req_state_link())) // 요구사항 상태

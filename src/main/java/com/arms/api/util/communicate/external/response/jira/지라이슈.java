@@ -66,6 +66,14 @@ public class 지라이슈 {
 
     private Long cReqLink;
 
+    public Boolean etcBoolean(){
+        if(etc instanceof Boolean){
+            return (Boolean)etc;
+        }else{
+            return false;
+        }
+    }
+
     private String _class; //추가
     @Getter
     @Setter
