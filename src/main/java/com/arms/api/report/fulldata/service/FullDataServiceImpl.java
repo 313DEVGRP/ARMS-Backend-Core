@@ -119,11 +119,17 @@ public class FullDataServiceImpl implements FullDataService {
 
             String deletedDate = issue.지라이슈_삭제_일자_가져오기();
 
+            String isReqName ="";
+            if (issue.getIsReq().equals(true)) {
+                isReqName = "요구사항";
+            } else if (issue.getIsReq().equals(false) && issue.etcBoolean().equals(false)) {
+                isReqName = "하위이슈";
+            }
+
             // 버전명 세팅 종료
             ExcelDataDTO excelData = ExcelDataDTO.builder()
-                    .pdServiceId(issue.getPdServiceId()) // 검토
+                    .pdServiceId(issue.getPdServiceId())
                     .pdServiceName(제품명)
-                    .pdServiceVersions(issue.getPdServiceVersions()) // 검토
                     .pdServiceVersionNames(버전명) // 가져온 이슈의 버전으로 보여준다는 점이 "중요"
 
                     // 요구사항 구분을 위해
@@ -131,8 +137,9 @@ public class FullDataServiceImpl implements FullDataService {
                     .parentReqKey(Optional.ofNullable(issue.getParentReqKey()).orElse(""))
                     .upperKey(Optional.ofNullable(issue.getUpperKey()).orElse(""))
                     .etc(issue.etcBoolean())
+                    .isReqName(isReqName)
 
-                    .cReqLink(issue.getCReqLink()) // 검토
+                    .cReqLink(issue.getCReqLink())
                     .reqTitle(reqAddEntityValue.getC_title()) // 요구사항
                     .reqState(요구사항_상태_맵.get(reqAddEntityValue.getC_req_state_link())) // 요구사항 상태
 

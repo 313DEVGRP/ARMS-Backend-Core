@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ExcelDataDTO {
 
-    private Long pdServiceId; // 검토
+    private Long pdServiceId;
     private String pdServiceName;
     private Long[] pdServiceVersions;
     private String pdServiceVersionNames;
