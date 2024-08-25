@@ -113,7 +113,7 @@ public class FullDataServiceImpl implements FullDataService {
                 = Optional.ofNullable(pdServiceVersions)
                     .map(versions->Arrays.stream(versions)
                             .filter(버전아이디_이름및일정_맵::containsKey)
-                            .map(String::valueOf)
+                            .map(버전아이디_이름및일정_맵::get)
                             .collect(Collectors.joining(",")))
                     .orElse(" - ");
 
