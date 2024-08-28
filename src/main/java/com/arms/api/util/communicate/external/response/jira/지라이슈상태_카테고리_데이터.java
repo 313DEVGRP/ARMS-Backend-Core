@@ -12,13 +12,14 @@ import lombok.*;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class 지라이슈상태_데이터 extends ALM_데이터{
+public class 지라이슈상태_카테고리_데이터 {
+    private String self;
+
+    private String id;
 
     private String name;
 
-    private String description;
+    private String key;
 
-    private String issueTypeId;
-
-    private 지라이슈상태_카테고리_데이터 statusCategory;
+    private String colorName;
 }
