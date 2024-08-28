@@ -11,6 +11,7 @@
  */
 package com.arms.api.jira.jiraproject_pure.controller;
 
+import com.arms.api.jira.jiraproject_pure.model.AllJiraProjectsDTO;
 import com.arms.api.jira.jiraproject_pure.model.JiraProjectPureDTO;
 import com.arms.api.jira.jiraproject_pure.model.JiraProjectPureEntity;
 import com.arms.api.jira.jiraproject_pure.service.JiraProjectPure;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -50,13 +52,15 @@ public class JiraProjectPureController extends TreeAbstractController<JiraProjec
 
     @ResponseBody
     @GetMapping("/getJiraProjects.do")
-    public ResponseEntity<CommonResponse.ApiResult<List<JiraProjectPureEntity>>> getJiraProjectPures(
+    public ResponseEntity<CommonResponse.ApiResult<List<AllJiraProjectsDTO>>> getJiraProjectPures(
             @RequestParam(name = "pdServiceId") Long pdServiceId,
             @RequestParam(name = "pdServiceVersionIds", required = false) List<Long> pdServiceVersionIds
     ) throws Exception {
 
-        List<JiraProjectPureEntity> jiraProjectsByProduct = jiraProjectPure.getJiraProjects(pdServiceId, pdServiceVersionIds);
+        List<JiraProjectPureEntity> jiraProjectsByProduct = jiraProjectPure.getJiraProjects();
 
-        return ResponseEntity.ok(CommonResponse.success(jiraProjectsByProduct));
+        List<AllJiraProjectsDTO> response = jiraProjectsByProduct.stream().map(entity -> modelMapper.map(entity, AllJiraProjectsDTO.class)).collect(Collectors.toList());
+
+        return ResponseEntity.ok(CommonResponse.success(response));
     }
 }
