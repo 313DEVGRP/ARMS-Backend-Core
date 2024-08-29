@@ -3,6 +3,7 @@ package com.arms.api.report.fulldata.controller;
 import com.arms.api.report.fulldata.model.ExcelDataDTO;
 import com.arms.api.report.fulldata.model.FullDataAssigneesResponse;
 import com.arms.api.report.fulldata.model.FullDataRequestDTO;
+import com.arms.api.report.fulldata.model.작업자_정보;
 import com.arms.api.report.fulldata.service.FullDataService;
 import com.arms.api.util.communicate.external.response.jira.지라이슈;
 import com.arms.egovframework.javaservice.treeframework.controller.CommonResponse;
@@ -25,11 +26,10 @@ public class FullDataController {
 
     private final FullDataService fullDataService;
 
-
-    @GetMapping("/assignees")
-    public ResponseEntity<CommonResponse.ApiResult<List<FullDataAssigneesResponse>>> getAssignees(@Validated FullDataRequestDTO fullDataRequestDTO) throws Exception {
-        List<FullDataAssigneesResponse> response = fullDataService.getAssignees(fullDataRequestDTO);
-        return ResponseEntity.ok(CommonResponse.success(response));
+    @GetMapping("/assignee-list")
+    public ResponseEntity<CommonResponse.ApiResult<List<작업자_정보>>> getAssignees() throws Exception {
+        List<작업자_정보> assigneeList = fullDataService.getAssigneeList();
+        return ResponseEntity.ok(CommonResponse.success(assigneeList));
     }
 
     @GetMapping("/{changeReqTableName}/excel-data")

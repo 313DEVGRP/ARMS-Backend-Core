@@ -5,10 +5,7 @@ import com.arms.api.jira.jiraproject_pure.service.JiraProjectPure;
 import com.arms.api.product_service.pdservice.model.PdServiceEntity;
 import com.arms.api.product_service.pdservice.service.PdService;
 import com.arms.api.product_service.pdserviceversion.model.PdServiceVersionEntity;
-import com.arms.api.report.fulldata.model.ExcelDataDTO;
-import com.arms.api.report.fulldata.model.FullDataAssigneesResponse;
-import com.arms.api.report.fulldata.model.FullDataRequestDTO;
-import com.arms.api.report.fulldata.model.FullDataResponseDTO;
+import com.arms.api.report.fulldata.model.*;
 import com.arms.api.requirement.reqadd.service.ReqAdd;
 import com.arms.api.requirement.reqadd_pure.model.ReqAddPureEntity;
 import com.arms.api.requirement.reqadd_pure.service.ReqAddPure;
@@ -44,13 +41,11 @@ public class FullDataServiceImpl implements FullDataService {
     private final ReqAddPure reqAddPure;
 
     private final JiraProjectPure jiraProjectPure;
+
     @Override
-    public List<FullDataAssigneesResponse> getAssignees(FullDataRequestDTO fullDataRequestDTO) throws Exception {
-        List<JiraProjectPureEntity> almProjects = jiraProjectPure.getJiraProjects(fullDataRequestDTO.getAlmProjectIds());
-        List<String> almProjectUrls = almProjects.stream().map(JiraProjectPureEntity::getC_jira_url).collect(Collectors.toList());
-        fullDataRequestDTO.setAlmProjectUrls(almProjectUrls);
-        ResponseEntity<List<FullDataAssigneesResponse>> fullDataReportAssignees = engineService.getAssignees(fullDataRequestDTO);
-        return fullDataReportAssignees.getBody();
+    public List<작업자_정보> getAssigneeList() {
+        ResponseEntity<List<작업자_정보>> listResponseEntity = engineService.getAssigneeList();
+        return listResponseEntity.getBody();
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.arms.api.jira.jiraserver.model.계정정보_데이터;
 import com.arms.api.report.fulldata.model.FullDataAssigneesResponse;
 import com.arms.api.report.fulldata.model.FullDataRequestDTO;
 import com.arms.api.report.fulldata.model.FullDataResponseDTO;
+import com.arms.api.report.fulldata.model.작업자_정보;
 import com.arms.api.util.communicate.external.request.지라서버정보_데이터;
 import com.arms.api.util.communicate.external.response.aggregation.검색결과;
 import com.arms.api.util.communicate.external.response.jira.*;
@@ -184,9 +185,8 @@ public interface EngineService {
             @RequestParam("pdServiceVersions") Long[] pdServiceVersionLinks,
             @RequestParam("cReqLink") Long 요구사항_아이디);
 
-
     @GetMapping("/engine/report/resource-list")
-    ResponseEntity<List<FullDataAssigneesResponse>> getAssignees(@SpringQueryMap FullDataRequestDTO fullDataRequestDTO);
+    ResponseEntity<List<작업자_정보>> getAssigneeList();
 
     /*
      *  요구사항 묶음 조회(함께 생성된 요구사항 이슈 모두 조회)
