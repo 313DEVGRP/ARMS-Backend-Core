@@ -73,6 +73,8 @@ public class 지라이슈 {
 
     private Long cReqLink;
 
+    private 암스_요구사항_속성 cReqProperty;
+
     public Boolean etcBoolean(){
         if(etc instanceof Boolean){
             return (Boolean)etc;
@@ -359,5 +361,30 @@ public class 지라이슈 {
                 }
         ).collect(Collectors.toList());
 
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class 암스_요구사항_속성 {
+
+        @JsonProperty("cReqPriorityLink")
+        private Long cReqPriorityLink;
+        @JsonProperty("cReqPriorityName")
+        private String cReqPriorityName;
+
+        @JsonProperty("cReqDifficultyLink")
+        private Long cReqDifficultyLink;
+        @JsonProperty("cReqDifficultyName")
+        private String cReqDifficultyName;
+
+        @JsonProperty("cReqStateLink")
+        private Long cReqStateLink;
+        @JsonProperty("cReqStateName")
+        private String cReqStateName;
     }
 }

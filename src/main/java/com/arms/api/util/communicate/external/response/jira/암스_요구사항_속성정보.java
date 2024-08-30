@@ -11,9 +11,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class 암스_요구사항_속성정보 {
     // 지라이슈 인덱스 생성 시, 암스_요구사항_속성 정보 전달을 위한 DTO
-    private Long cReqLink;
-    private Long pdServiceId;
-    private Long[] pdServiceVersions;
+//    private Long cReqLink;
+//    private Long pdServiceId;
+//    private Long[] pdServiceVersions;
     private Long cReqPriorityLink;
     private String cReqPriorityName;
     private Long cReqDifficultyLink;

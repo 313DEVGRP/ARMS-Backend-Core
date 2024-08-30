@@ -20,6 +20,7 @@ import com.arms.api.requirement.reqstatus.model.ReqStatusDTO;
 import com.arms.api.requirement.reqstatus.model.ReqStatusEntity;
 import com.arms.api.requirement.reqstatus.service.ReqStatus;
 import com.arms.api.util.communicate.external.EngineService;
+import com.arms.api.util.communicate.external.response.jira.암스_요구사항_속성정보;
 import com.arms.api.util.communicate.external.response.jira.지라이슈;
 import com.arms.api.util.communicate.internal.InternalService;
 import com.arms.egovframework.javaservice.treeframework.remote.Chat;
@@ -117,6 +118,7 @@ public class 스케쥴러_서비스 extends TreeServiceImpl implements 스케쥴
 
 				filteredIssues.forEach(요구사항_이슈 -> reqStatus.ALM서버_요구사항_처리_및_REQSTATUS_업데이트(요구사항_이슈, 제품서비스_아이디));
 			}
+			// 다른스케줄
 			else {
 				for (ReqStatusEntity 요구사항_이슈_엔티티 : 결과) {
 					JiraServerPureEntity 지라서버_검색 = new JiraServerPureEntity();
@@ -141,7 +143,11 @@ public class 스케쥴러_서비스 extends TreeServiceImpl implements 스케쥴
 						this.FROM_검색엔진_이슈데이터_TO_요구사항_REQSTATUS_동기화(요구사항_이슈_엔티티, 지라서버, 제품서비스_아이디);
 					}
 					else {
-						this.스케쥴러_타입별_요구사항_이슈_ES저장(요구사항_이슈_엔티티, 지라서버, 스케쥴러_타입);
+						암스_요구사항_속성정보 암스_요구사항_속성정보 =
+								new 암스_요구사항_속성정보(요구사항_이슈_엔티티.getC_req_priority_link(),요구사항_이슈_엔티티.getC_req_priority_name(),
+										요구사항_이슈_엔티티.getC_req_difficulty_link(), 요구사항_이슈_엔티티.getC_req_difficulty_name(),
+										요구사항_이슈_엔티티.getC_req_state_link(), 요구사항_이슈_엔티티.getC_req_state_name());
+						this.스케쥴러_타입별_요구사항_이슈_ES저장(요구사항_이슈_엔티티, 지라서버, 스케쥴러_타입, 암스_요구사항_속성정보);
 					}
 				}
 			}
@@ -217,7 +223,7 @@ public class 스케쥴러_서비스 extends TreeServiceImpl implements 스케쥴
 		}
 	}
 
-	private void 스케쥴러_타입별_요구사항_이슈_ES저장(ReqStatusEntity 요구사항_이슈_엔티티, JiraServerPureEntity 지라서버, String 스케쥴러_타입) {
+	private void 스케쥴러_타입별_요구사항_이슈_ES저장(ReqStatusEntity 요구사항_이슈_엔티티, JiraServerPureEntity 지라서버, String 스케쥴러_타입, 암스_요구사항_속성정보 암스_요구사항_속성정보) {
 		String 버전_목록_문자열 = 요구사항_이슈_엔티티.getC_req_pdservice_versionset_link();
 		if (버전_목록_문자열 == null || 버전_목록_문자열.isEmpty()) {
 			log.info("버전_목록_문자열이 없습니다. 진행중인 ReqStatusEntity c_id => {} 의 버전_목록이 없습니다."
@@ -238,7 +244,8 @@ public class 스케쥴러_서비스 extends TreeServiceImpl implements 스케쥴
 					요구사항_이슈_엔티티.getC_pdservice_link(),
 					버전_아이디_목록_배열,
 					요구사항_이슈_엔티티.getC_req_link(),
-					요구사항_이슈_엔티티.getC_jira_project_key()
+					요구사항_이슈_엔티티.getC_jira_project_key(),
+					암스_요구사항_속성정보
 			);
 		}
 		else if (스케쥴러_타입.equals("증분_요구사항_이슈_검색엔진_벌크_저장")) {
@@ -248,7 +255,8 @@ public class 스케쥴러_서비스 extends TreeServiceImpl implements 스케쥴
 					요구사항_이슈_엔티티.getC_pdservice_link(),
 					버전_아이디_목록_배열,
 					요구사항_이슈_엔티티.getC_req_link(),
-					요구사항_이슈_엔티티.getC_jira_project_key()
+					요구사항_이슈_엔티티.getC_jira_project_key(),
+					암스_요구사항_속성정보
 			);
 		}
 		else if (스케쥴러_타입.equals("서브테스크_상위키_필드업데이트")) {
@@ -258,7 +266,8 @@ public class 스케쥴러_서비스 extends TreeServiceImpl implements 스케쥴
 					요구사항_이슈_엔티티.getC_pdservice_link(),
 					버전_아이디_목록_배열,
 					요구사항_이슈_엔티티.getC_req_link(),
-					요구사항_이슈_엔티티.getC_jira_project_key()
+					요구사항_이슈_엔티티.getC_jira_project_key(),
+					암스_요구사항_속성정보
 			);
 		}
 

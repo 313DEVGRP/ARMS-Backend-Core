@@ -97,7 +97,8 @@ public interface EngineService {
             @RequestParam("pdServiceId") Long 제품서비스_아이디,
             @RequestParam("pdServiceVersions") Long[] 버전_아이디_배열,
             @RequestParam("cReqLink") Long cReqLink,
-            @RequestParam("projectKeyOrId") String 프로젝트키_또는_아이디
+            @RequestParam("projectKeyOrId") String 프로젝트키_또는_아이디,
+            @SpringQueryMap 암스_요구사항_속성정보 암스_요구사항_속성정보
     );
 
     @GetMapping("/engine/jira/{connectId}/issue/increment/loadToES/bulk/{issueKey}")
@@ -107,7 +108,8 @@ public interface EngineService {
             @RequestParam("pdServiceId") Long 제품서비스_아이디,
             @RequestParam("pdServiceVersions") Long[] 버전_아이디_배열,
             @RequestParam("cReqLink") Long cReqLink,
-            @RequestParam("projectKeyOrId") String 프로젝트키_또는_아이디
+            @RequestParam("projectKeyOrId") String 프로젝트키_또는_아이디,
+            @SpringQueryMap 암스_요구사항_속성정보 암스_요구사항_속성정보
     );
 
     @PostMapping("/engine/jira/{connectId}/issue/update/field/upperKey/{issueKey}")
@@ -117,7 +119,8 @@ public interface EngineService {
             @RequestParam("pdServiceId") Long 제품서비스_아이디,
             @RequestParam("pdServiceVersions") Long[] 버전_아이디_배열,
             @RequestParam("cReqLink") Long cReqLink,
-            @RequestParam("projectKeyOrId") String 프로젝트키_또는_아이디
+            @RequestParam("projectKeyOrId") String 프로젝트키_또는_아이디,
+            @SpringQueryMap 암스_요구사항_속성정보 암스_요구사항_속성정보
     );
 
 
