@@ -56,7 +56,6 @@ public class FullDataServiceImpl implements FullDataService {
             List<String> almProjectUrls = almProjects.stream().map(JiraProjectPureEntity::getC_jira_url).collect(Collectors.toList());
             fullDataRequestDTO.setAlmProjectUrls(almProjectUrls);
         }
-
         // 반환할 엑셀 데이터 리스트
         List<ExcelDataDTO> excelDataList = new ArrayList<>();
 
@@ -179,6 +178,124 @@ public class FullDataServiceImpl implements FullDataService {
         log.info("[ FullDataServiceImpl :: getExcelData ] :: excelData size => {}", excelDataList.size());
 
         SessionUtil.removeAttribute("excel-data");
+
+        return excelDataList;
+    }
+
+    @Override
+    public List<ExcelDataDTO> getExcelData(FullDataRequestDTO fullDataRequestDTO) throws Exception {
+        // 반환할 엑셀 데이터 리스트
+        List<ExcelDataDTO> excelDataList = new ArrayList<>();
+        // isReq true - key 및 idx Map
+        Map<String, Integer> reqKeyIndexMap = new HashMap<>();
+        // isReq false 데이터 리스트
+        List<ExcelDataDTO> subDataList = new ArrayList<>();
+
+        PdServiceEntity 제품서비스_조회 = new PdServiceEntity();
+        List<PdServiceEntity> 제품서비스_리스트 = pdService.getNodesWithoutRoot(제품서비스_조회);
+
+        Map<Long, String> 제품서비스_아이디_이름_맵 = new HashMap<>();
+        Map<Long, String> 버전_아이디_이름_맵 = new HashMap<>();
+
+        for (PdServiceEntity entity : 제품서비스_리스트) {
+
+            제품서비스_아이디_이름_맵.put(entity.getC_id(),entity.getC_title());
+            Set<PdServiceVersionEntity> pdServiceVersionEntities = entity.getPdServiceVersionEntities();
+            Map<Long, String> 버전아이디_이름및일정_맵_구성 = 버전아이디_이름및일정_맵_구성(pdServiceVersionEntities);
+
+            // 현재 entity의 맵을 total_version_map에 병합
+            for (Map.Entry<Long, String> entry : 버전아이디_이름및일정_맵_구성.entrySet()) {
+                버전_아이디_이름_맵.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        ResponseEntity<FullDataResponseDTO> excelDataFromEngine = engineService.getExcelData(fullDataRequestDTO);
+        List<지라이슈> ALM_이슈목록 = excelDataFromEngine.getBody().getIssueEntityList();
+        if(ALM_이슈목록.isEmpty()) {
+            log.info("[ FullDataServiceImpl :: getExcelData ] :: issue list is empty => 0");
+            return excelDataList;
+        }
+
+
+
+        for (지라이슈 issue : ALM_이슈목록) {
+//            if (StringUtils.equals(issue.지라이슈_삭제_일자_가져오기(), "")) {
+//                continue; // 삭제된 이슈 통과
+//            }
+
+            Long[] pdServiceVersions = issue.getPdServiceVersions();
+
+            String 버전명
+                    = Optional.ofNullable(pdServiceVersions)
+                    .map(versions->Arrays.stream(versions)
+                            .filter(버전_아이디_이름_맵::containsKey)
+                            .map(버전_아이디_이름_맵::get)
+                            .collect(Collectors.joining(",")))
+                    .orElse(" - ");
+
+            ExcelDataDTO.ExcelDataDTOBuilder 엑셀데이터_빌더 = ExcelDataDTO.builder()
+                    .pdServiceId(issue.getPdServiceId())
+                    .pdServiceName(제품서비스_아이디_이름_맵.get(issue.getPdServiceId()))
+                    .pdServiceVersionNames(버전명) // 가져온 이슈의 버전으로 보여준다는 점이 "중요"
+                    .cReqLink(issue.getCReqLink());
+
+            String isReqName ="";
+            if (issue.getIsReq().equals(true)) {
+                isReqName = "요구사항";
+                엑셀데이터_빌더.reqTitle(issue.getSummary())
+                                .isReqName(isReqName)
+                                .reqState(Optional.ofNullable(issue.getCReqProperty())
+                                                    .map(지라이슈.암스_요구사항_속성::getCReqStateName)
+                                                    .orElse(""));
+
+            } else if (issue.getIsReq().equals(false) && issue.etcBoolean().equals(false)) {
+                isReqName = issue.getParentReqKey()+"의 하위이슈";
+                엑셀데이터_빌더.reqTitle("")
+                                .reqState("")
+                                .isReqName(isReqName);
+            }
+            엑셀데이터_빌더
+                    .almProjectName(issue.getProject().getName())
+                    .key(issue.getKey())
+                    .issueID(issue.getIssueID())
+                    .issueTitle(issue.getSummary())
+                    .issueStatus(issue.getStatus().getName())
+                    .assigneeName(Optional.ofNullable(issue.getAssignee()).map(지라이슈.담당자::getDisplayName).orElse("담당자 정보 없음"))
+                    .assigneeEmail(Optional.ofNullable(issue.getAssignee()).map(지라이슈.담당자::getEmailAddress).orElse(""))
+
+                    // 생성일 수정일 해결일 삭제일(있다면)
+                    .createDate(Optional.ofNullable(issue.getCreated()).orElse(""))
+                    .updatedDate(Optional.ofNullable(issue.getUpdated()).orElse(""))
+                    .resolutionDate(Optional.ofNullable(issue.getResolutiondate()).orElse(""));
+
+            // 하위의 하위이슈, 연결이슈 체크해야함.
+
+            ExcelDataDTO excelData = 엑셀데이터_빌더.build();
+
+            if (issue.getIsReq().equals(true)) {
+                excelDataList.add(excelData);
+                reqKeyIndexMap.put(excelData.getKey(), excelDataList.size() - 1);
+            } else {
+                subDataList.add(excelData);
+            }
+        }
+
+        // 요구사항 - 하위이슈 순으로 재배열
+        for (ExcelDataDTO subData : subDataList) {
+            String parentReqKey = subData.getParentReqKey();
+            if (parentReqKey != null && reqKeyIndexMap.containsKey(parentReqKey)) {
+                int index = reqKeyIndexMap.get(subData.getParentReqKey());
+                // 요소를 index+1 위치에 삽입
+                excelDataList.add(index + 1, subData);
+                // 맵 갱신 (삽입된 요소 이후의 인덱스들이 변화하므로)
+                for (int i = index + 1; i < excelDataList.size(); i++) {
+                    reqKeyIndexMap.put(excelDataList.get(i).getKey(), i);
+                }
+            }
+        }
+
+        log.info("[ FullDataServiceImpl :: getExcelData ] :: issue size => {}", ALM_이슈목록.size());
+        log.info("[ FullDataServiceImpl :: getExcelData ] :: excelData size => {}", excelDataList.size());
 
         return excelDataList;
     }

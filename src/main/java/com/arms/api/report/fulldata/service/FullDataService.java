@@ -13,4 +13,8 @@ public interface FullDataService {
     List<작업자_정보> getAssigneeList();
 
     List<ExcelDataDTO> getExcelData(String changeReqTableName, FullDataRequestDTO fullDataRequestDTO) throws Exception;
+
+    List<ExcelDataDTO> getExcelData(FullDataRequestDTO fullDataRequestDTO) throws Exception;
+
+
 }
